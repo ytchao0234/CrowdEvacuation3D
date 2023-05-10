@@ -28,6 +28,11 @@ public class FloorModel : MonoBehaviour
                 floor[i, j] = obj;
             }
         }
+
+        foreach (Vector2Int exit in gui.exitPos)
+        {
+            floor[exit.x, exit.y].transform.tag = "Exit";
+        }
     }
 
     // Update is called once per frame

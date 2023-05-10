@@ -10,6 +10,7 @@ public class GUI : MonoBehaviour
     public Vector2Int[] exitPos = {
             new Vector2Int(0,0)
         };
+    public float mS = 1.0f;
     public float sff_init_value = 1000f;
     public float sff_offset_hv = 1.0f;
     public float sff_offset_lambda = 1.5f;
