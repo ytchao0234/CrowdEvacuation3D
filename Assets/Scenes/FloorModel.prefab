@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 180854251928205957}
   - component: {fileID: 2355102155469285511}
+  - component: {fileID: -6332102388429149465}
   m_Layer: 0
   m_Name: FloorModel
   m_TagString: Untagged
@@ -45,3 +46,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   plane: {fileID: 1113158946859606556, guid: 9718a2f7f98ab6f499670f91c670dfbe, type: 3}
+--- !u!114 &-6332102388429149465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4377459558391245699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b55ed524cfe80249a232ab69a36a47d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
