@@ -7,6 +7,8 @@ TagManager:
   - ActiveAgent
   - ExitAgent
   - Exit
+  - MovableObstacle
+  - ImmovableObstacle
   layers:
   - Default
   - TransparentFX

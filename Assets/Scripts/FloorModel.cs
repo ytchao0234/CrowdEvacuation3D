@@ -41,8 +41,18 @@ public class FloorModel : MonoBehaviour
         
     }
 
-    public bool checkValidPlane(int i, int j)
+    public bool isEmptyCell(Vector2Int cell)
     {
-        return floor[i, j].transform.childCount == 0;
+        return floor[cell.x, cell.y].transform.childCount == 0;
+    }
+    public bool isValidCell(Vector2Int cell)
+    {
+        bool flg = isEmptyCell(cell);
+        if (flg) return flg;
+
+        flg  = floor[cell.x, cell.y].transform.GetChild(0).tag != "MovableObstacle";
+        flg &= floor[cell.x, cell.y].transform.GetChild(0).tag != "ImmovableObstacle";
+
+        return flg;
     }
 }

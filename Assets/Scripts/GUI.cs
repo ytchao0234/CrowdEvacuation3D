@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class GUI : MonoBehaviour
 {
-    public int planeRow = 3;
-    public int planeCol = 3;
-    public float agentDensity = 1.0f;
+    public int planeRow = 10;
+    public int planeCol = 10;
+    public float agentDensity = 0.3f;
     public Vector2Int[] exitPos = {
-            new Vector2Int(0,0)
+            new Vector2Int(0,1)
         };
     public float mS = 1.0f;
     public float sff_init_value = 1000f;

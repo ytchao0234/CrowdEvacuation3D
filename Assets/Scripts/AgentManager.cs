@@ -11,7 +11,7 @@ public class AgentManager : MonoBehaviour
     void Start()
     {
         GUI gui = FindObjectOfType<GUI>();
-        FloorModel floorModel = FindObjectOfType<FloorModel>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
     
         float agentDensity = gui.agentDensity;
         int planeRow = gui.planeRow;
@@ -35,11 +35,13 @@ public class AgentManager : MonoBehaviour
             int j = index % planeCol;
             indexList.RemoveAt(rnd);
 
-            if (floorModel.checkValidPlane(i, j))
+            if (fm.isEmptyCell(new Vector2Int(i, j)))
             {
-                GameObject obj = GameObject.Instantiate(agent, floorModel.floor[i, j].transform);
+                GameObject obj = GameObject.Instantiate(agent, fm.floor[i, j].transform);
                 obj.transform.localScale = Vector3.one;
                 obj.transform.position += Vector3.up * agentHeight / 2f;
+                obj.transform.tag = "ActiveAgent";
+                obj.GetComponent<Renderer>().material.color = Color.blue;
             }
         }
     }
@@ -74,19 +76,17 @@ public class AgentManager : MonoBehaviour
         FloorField ff = FindObjectOfType<FloorField>();
         List<(Vector2Int, float)> possiblePos = new List<(Vector2Int, float)>();
 
-        agentTrans.position = fm.floor[0, 0].transform.position;
-        agentTrans.position += Vector3.up * agentHeight / 2f;
-        agentTrans.parent = fm.floor[0, 0].transform;
-
         for (int m = -1; m <= 1; m++)
         for (int n = -1; n <= 1; n++)
         {
             if (m == 0 && n == 0) continue;
             Vector2Int cell = new Vector2Int(i + m, j + n);
 
-            if (ff.isValidCell(cell))
+            if (ff.isValidCell(cell) && fm.isValidCell(cell))
                 possiblePos.Add((cell, ff.ff[cell.x, cell.y]));
         }
+
+        if (possiblePos.Count == 0) return;
 
         possiblePos.Sort((a, b) => a.Item2.CompareTo(b.Item2));
 

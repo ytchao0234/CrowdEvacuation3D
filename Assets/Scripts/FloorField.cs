@@ -17,7 +17,7 @@ public class FloorField : MonoBehaviour
         for (int j = 0; j < gui.planeCol; j++)
         {
             ff[i,j] = gui.mS * sff.sff[i,j];
-            Debug.Log(ff[i, j]);
+            // Debug.Log(ff[i, j]);
         }
     }
 
