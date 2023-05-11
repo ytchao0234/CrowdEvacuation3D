@@ -45,6 +45,11 @@ public class FloorModel : MonoBehaviour
     {
         return floor[cell.x, cell.y].transform.childCount == 0;
     }
+
+    public bool isExitCell(Vector2Int cell)
+    {
+        return floor[cell.x, cell.y].transform.tag == "Exit";
+    }
     public bool isValidCell(Vector2Int cell)
     {
         bool flg = isEmptyCell(cell);

@@ -35,7 +35,7 @@ public class AgentManager : MonoBehaviour
             int j = index % planeCol;
             indexList.RemoveAt(rnd);
 
-            if (fm.isEmptyCell(new Vector2Int(i, j)))
+            if (fm.isEmptyCell(new Vector2Int(i, j)) && !fm.isExitCell(new Vector2Int(i, j)))
             {
                 GameObject obj = GameObject.Instantiate(agent, fm.floor[i, j].transform);
                 obj.transform.localScale = Vector3.one;

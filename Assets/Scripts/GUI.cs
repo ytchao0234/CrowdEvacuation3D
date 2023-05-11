@@ -4,11 +4,16 @@ using UnityEngine;
 
 public class GUI : MonoBehaviour
 {
-    public int planeRow = 10;
-    public int planeCol = 10;
+    public int planeRow = 30;
+    public int planeCol = 30;
     public float agentDensity = 0.3f;
     public Vector2Int[] exitPos = {
-            new Vector2Int(0,1)
+            new Vector2Int(0,16),
+            new Vector2Int(29,14),
+            new Vector2Int(29,15),
+            new Vector2Int(29,16),
+            new Vector2Int(29,17),
+            new Vector2Int(29,18)
         };
     public float mS = 1.0f;
     public float sff_init_value = 1000f;

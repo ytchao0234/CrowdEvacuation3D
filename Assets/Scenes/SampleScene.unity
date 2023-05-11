@@ -396,7 +396,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 45, y: 100, z: 45}
+  m_LocalPosition: {x: 150, y: 300, z: 150}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -606,19 +606,63 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: planeCol
-      value: 10
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: planeRow
-      value: 10
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: agentDensity
       value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: exitPos.Array.data[0].y
-      value: 1
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.data[1].x
+      value: 29
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.data[1].y
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.data[2].x
+      value: 29
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.data[2].y
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.data[3].x
+      value: 29
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.data[3].y
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.data[4].x
+      value: 29
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.data[4].y
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.data[5].x
+      value: 29
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: exitPos.Array.data[5].y
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 8916218576673544333, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: m_Pivot.x
