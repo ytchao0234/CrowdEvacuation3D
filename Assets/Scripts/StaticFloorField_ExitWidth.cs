@@ -2,27 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StaticFloorField : MonoBehaviour
+public class StaticFloorField_ExitWidth : MonoBehaviour
 {
-    public float[,] sff;
+    public float[,] sff_e;
     // Start is called before the first frame update
     void Start()
     {
         GUI gui = FindObjectOfType<GUI>();
         Vector2Int[] exitPos = gui.exitPos;
-        sff = new float[gui.planeRow, gui.planeCol];
+        int[] exitWidth = gui.exitWidth;
+        sff_e = new float[gui.planeRow, gui.planeCol];
 
         // Set initial values
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
-            sff[i, j] = gui.sff_init_value;
+            sff_e[i, j] = gui.sff_init_value;
         }
 
-        foreach (Vector2Int exit in exitPos)
+        for (int i = 0; i < exitPos.Length; i++)
         {
-            sff[exit.x, exit.y] = 0;
-            SetSFF_OneExit(exit);
+            sff_e[exitPos[i].x, exitPos[i].y] = 0;
+            SetSFFE_OneExit(exitPos[i], exitWidth[i]);
         }
     }
 
@@ -32,12 +33,12 @@ public class StaticFloorField : MonoBehaviour
         
     }
 
-    void SetSFF_OneExit(Vector2Int exitPos)
+    void SetSFFE_OneExit(Vector2Int exitPos, int exitWidth)
     {
         GUI gui = FindObjectOfType<GUI>();
         FloorField ff = FindObjectOfType<FloorField>();
 
-        float offset_hv = gui.sff_offset_hv;
+        float offset_hv = Mathf.Exp(-1.0f * exitWidth / gui.totalExitWidth);
         float offset_d = offset_hv * gui.sff_offset_lambda;
 
         Queue<Vector2Int> toDoList = new Queue<Vector2Int>();
@@ -59,9 +60,9 @@ public class StaticFloorField : MonoBehaviour
                 {
                     float offset = (i == 0 || j == 0) ? offset_hv : offset_d;
 
-                    if (sff[adjCell.x, adjCell.y] > sff[curCell.x, curCell.y] + offset)
+                    if (sff_e[adjCell.x, adjCell.y] > sff_e[curCell.x, curCell.y] + offset)
                     {
-                        sff[adjCell.x, adjCell.y] = sff[curCell.x, curCell.y] + offset;
+                        sff_e[adjCell.x, adjCell.y] = sff_e[curCell.x, curCell.y] + offset;
                         toDoList.Enqueue(adjCell);
                     }
                 }

@@ -11,6 +11,7 @@ public class FloorField : MonoBehaviour
     {
         GUI gui = FindObjectOfType<GUI>();
         StaticFloorField sff = FindObjectOfType<StaticFloorField>();
+        StaticFloorField_ExitWidth sff_e = FindObjectOfType<StaticFloorField_ExitWidth>();
         FloorModel fm = FindObjectOfType<FloorModel>();
 
         ff = new float[gui.planeRow, gui.planeCol];
@@ -18,8 +19,7 @@ public class FloorField : MonoBehaviour
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
-            ff[i,j] = gui.mS * sff.sff[i,j];
-            // Debug.Log(ff[i, j]);
+            ff[i,j] = gui.kS * sff.sff[i,j] + gui.kE * sff_e.sff_e[i,j];
         }
 
         DrawHeatMap();
