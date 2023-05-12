@@ -7,6 +7,7 @@ public class AgentManager : MonoBehaviour
     public GameObject agent;
     int agentNumber;
     float agentHeight;
+    Vector2Int[,] lastPos;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,6 +19,7 @@ public class AgentManager : MonoBehaviour
         int planeCol = gui.planeCol;
         agentNumber = Mathf.FloorToInt(planeRow * planeCol * agentDensity);
         agentHeight = agent.transform.GetComponent<Renderer>().bounds.size.y;
+        lastPos = new Vector2Int[planeRow, planeCol];
 
         int[] randomNumbers = new int [planeRow * planeCol];
         for (int k = 0; k < randomNumbers.Length; k ++)
@@ -38,10 +40,11 @@ public class AgentManager : MonoBehaviour
             if (fm.isEmptyCell(new Vector2Int(i, j)) && !fm.isExitCell(new Vector2Int(i, j)))
             {
                 GameObject obj = GameObject.Instantiate(agent, fm.floor[i, j].transform);
-                obj.transform.localScale = Vector3.one;
-                obj.transform.position += Vector3.up * agentHeight / 2f;
+                obj.transform.localScale = Vector3.one * 4f;
+                obj.transform.position += Vector3.up * agentHeight * 2f;
                 obj.transform.tag = "ActiveAgent";
-                obj.GetComponent<Renderer>().material.color = Color.blue;
+                obj.GetComponent<Renderer>().material.color = Color.white;
+                lastPos[i,j] = new Vector2Int(i,j);
             }
         }
     }
@@ -50,7 +53,10 @@ public class AgentManager : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
+        {
             AgentMove();
+            FindObjectOfType<DynamicFloorField>().UpdateDFF_Diffuse_and_Decay();
+        }
     }
 
     void AgentMove()
@@ -74,12 +80,14 @@ public class AgentManager : MonoBehaviour
     {
         FloorModel fm = FindObjectOfType<FloorModel>();
         FloorField ff = FindObjectOfType<FloorField>();
+        DynamicFloorField dff = FindObjectOfType<DynamicFloorField>();
         List<(Vector2Int, float)> possiblePos = new List<(Vector2Int, float)>();
 
         for (int m = -1; m <= 1; m++)
         for (int n = -1; n <= 1; n++)
         {
             if (m == 0 && n == 0) continue;
+            if (lastPos[i,j].x == i + m && lastPos[i,j].y == j + n) continue;
             Vector2Int cell = new Vector2Int(i + m, j + n);
 
             if (ff.isValidCell(cell) && fm.isValidCell(cell))
@@ -88,19 +96,20 @@ public class AgentManager : MonoBehaviour
 
         if (possiblePos.Count == 0) return;
 
-        possiblePos.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+        possiblePos.Sort((a, b) => -a.Item2.CompareTo(b.Item2));
 
         for (int m = possiblePos.Count - 1; m >= 0; m--)
         {
-            if (possiblePos[m].Item2 <= possiblePos[0].Item2)
+            if (possiblePos[m].Item2 >= possiblePos[0].Item2)
             {
                 int rnd = Random.Range(0, m + 1);
                 Vector2Int cell = possiblePos[rnd].Item1;
-                Debug.Log(cell);
     
                 agentTrans.position = fm.floor[cell.x, cell.y].transform.position;
                 agentTrans.position += Vector3.up * agentHeight / 2f;
                 agentTrans.parent = fm.floor[cell.x, cell.y].transform;
+                dff.dff[lastPos[i,j].x, lastPos[i,j].y] += 1f;
+                lastPos[i,j] = cell;
 
                 if (fm.floor[cell.x, cell.y].transform.tag == "Exit")
                     agentTrans.tag = "ExitAgent";

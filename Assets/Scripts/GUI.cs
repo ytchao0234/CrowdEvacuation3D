@@ -18,10 +18,12 @@ public class GUI : MonoBehaviour
         };
     public int[] exitWidth;
     public int totalExitWidth = 0;
-    public float kS = 0.0f, kE = 1.0f;
+    public float kS = 0.0f, kE = 1.0f, kD = 1.0f;
     public float sff_init_value = 1000f;
     public float sff_offset_hv = 1.0f;
     public float sff_offset_lambda = 1.5f;
+    public float dff_decay = 0.8f;
+    public float dff_diffuse = 0.8f;
 
     // Start is called before the first frame update
     void Start()

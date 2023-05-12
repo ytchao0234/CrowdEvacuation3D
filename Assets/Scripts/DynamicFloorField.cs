@@ -3,52 +3,73 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class FloorField : MonoBehaviour
+public class DynamicFloorField : MonoBehaviour
 {
-    public float[,] ff;
+    public float[,] dff;
     // Start is called before the first frame update
     void Start()
     {
         GUI gui = FindObjectOfType<GUI>();
-        StaticFloorField sff = FindObjectOfType<StaticFloorField>();
-        StaticFloorField_ExitWidth sff_e = FindObjectOfType<StaticFloorField_ExitWidth>();
-        DynamicFloorField dff = FindObjectOfType<DynamicFloorField>();
-        FloorModel fm = FindObjectOfType<FloorModel>();
+        Vector2Int[] exitPos = gui.exitPos;
+        dff = new float[gui.planeRow, gui.planeCol];
 
-        ff = new float[gui.planeRow, gui.planeCol];
-        
+        // Set initial values
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
-            ff[i,j] = -gui.kS * sff.sff[i,j] - gui.kE * sff_e.sff_e[i,j] + gui.kD * dff.dff[i,j];
+            dff[i, j] = 0f;
         }
-
-        // DrawHeatMap();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
-    public bool isValidCell(Vector2Int cell)
+
+    public void UpdateDFF_Diffuse_and_Decay()
     {
         GUI gui = FindObjectOfType<GUI>();
+        FloorField ff = FindObjectOfType<FloorField>();
+        float[,] tmp_dff = new float[gui.planeRow, gui.planeCol];
 
-        bool flg = true;
-        flg &= cell.x >= 0 && cell.x < gui.planeRow;
-        flg &= cell.y >= 0 && cell.y < gui.planeCol;
+        for (int i = 0; i < gui.planeRow; i++)
+        for (int j = 0; j < gui.planeCol; j++)
+        {
+            Vector2Int curCell = new Vector2Int(i, j);
+            Vector2Int adjCell = curCell;
 
-        return flg;
+            for (int ii = -1; ii <= 1; ii++)
+			for (int jj = -1; jj <= 1; jj++)
+            {
+                if (ii == 0 && jj == 0) continue;
+
+                adjCell = curCell + new Vector2Int(ii, jj);
+
+                if (ff.isValidCell(adjCell))
+                {
+                    tmp_dff[curCell.x, curCell.y] += dff[adjCell.x, adjCell.y];
+                }
+            }
+            tmp_dff[curCell.x, curCell.y] = 
+                (1f - gui.dff_decay) * 
+                    (
+                        (1f - gui.dff_diffuse) *
+                        dff[curCell.x, curCell.y] + 
+                        gui.dff_diffuse * tmp_dff[curCell.x, curCell.y] / 8f
+                    );
+        }
+
+        dff = tmp_dff;
+        DrawHeatMap();
     }
-
     void DrawHeatMap()
     {
         GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
 
-        float min = ff.Cast<float>().Min();
-        float max = ff.Cast<float>().Max();
+        float min = dff.Cast<float>().Min();
+        float max = dff.Cast<float>().Max();
         float range = max - min;
 
         Gradient gradient = new Gradient();
@@ -80,7 +101,7 @@ public class FloorField : MonoBehaviour
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
-            float value = ((ff[i,j] - min) / range);
+            float value = ((dff[i,j] - min) / range);
             fm.floor[i,j].GetComponent<Renderer>().material.color = gradient.Evaluate(value);
         }
     }

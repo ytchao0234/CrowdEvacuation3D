@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2355102155469285511}
   - component: {fileID: 5214316032217746313}
   - component: {fileID: -6332102388429149465}
+  - component: {fileID: 7938599435880535503}
+  - component: {fileID: 4247591477384767702}
   m_Layer: 0
   m_Name: FloorModel
   m_TagString: Untagged
@@ -69,5 +71,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b55ed524cfe80249a232ab69a36a47d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7938599435880535503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4377459558391245699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e44c68bbdd45314d8c993c856a176ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4247591477384767702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4377459558391245699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37b985e054a2ab14dbfa7508537a9fac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
