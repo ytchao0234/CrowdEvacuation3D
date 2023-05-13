@@ -81,20 +81,25 @@ public class AgentManager : MonoBehaviour
 
     void AgentMove_OneAgent(int i, int j, Transform agentTrans)
     {
+        GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
         FloorField ff = FindObjectOfType<FloorField>();
         DynamicFloorField dff = FindObjectOfType<DynamicFloorField>();
+
         List<(Vector2Int, float)> possiblePos = new List<(Vector2Int, float)>();
 
         for (int m = -1; m <= 1; m++)
         for (int n = -1; n <= 1; n++)
         {
-            if (m == 0 && n == 0) continue;
-            if (lastPos[i,j].x == i + m && lastPos[i,j].y == j + n) continue;
             Vector2Int cell = new Vector2Int(i + m, j + n);
+            float ff_value = ff.ff[cell.x, cell.y];
 
             if (ff.isValidCell(cell) && fm.isEmptyCell(cell))
-                possiblePos.Add((cell, ff.ff[cell.x, cell.y]));
+            {
+                if (lastPos[i,j].x == i + m && lastPos[i,j].y == j + n)
+                    ff_value = ff_value - gui.kD;
+                possiblePos.Add((cell, ff_value));
+            }
         }
 
         if (possiblePos.Count == 0) return;
@@ -107,10 +112,12 @@ public class AgentManager : MonoBehaviour
             {
                 int rnd = Random.Range(0, m + 1);
                 Vector2Int cell = possiblePos[rnd].Item1;
+                if (cell.x == i && cell.y == j) return;
     
                 agentTrans.position = fm.floor[cell.x, cell.y].transform.position;
                 agentTrans.position += Vector3.up * agentHeight / 2f;
                 agentTrans.parent = fm.floor[cell.x, cell.y].transform;
+
                 dff.dff[i,j] += 1f;
                 lastPos[cell.x,cell.y] = new Vector2Int(i,j);
 
