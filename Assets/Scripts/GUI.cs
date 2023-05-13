@@ -7,14 +7,14 @@ public class GUI : MonoBehaviour
 {
     public int planeRow = 30;
     public int planeCol = 30;
-    public float agentDensity = 0.3f;
+    public float agentDensity = 0.2f;
     public Vector2Int[] exitPos = {
-            new Vector2Int(0,16),
+            new Vector2Int(0,15),
+            new Vector2Int(29,13),
             new Vector2Int(29,14),
             new Vector2Int(29,15),
             new Vector2Int(29,16),
             new Vector2Int(29,17),
-            new Vector2Int(29,18),
         };
     public int[] exitWidth;
     public int totalExitWidth = 0;

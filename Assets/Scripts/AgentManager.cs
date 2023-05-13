@@ -55,6 +55,7 @@ public class AgentManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             AgentMove();
+            RemoveExitAgents();
             FindObjectOfType<DynamicFloorField>().UpdateDFF_Diffuse_and_Decay();
         }
     }
@@ -63,9 +64,11 @@ public class AgentManager : MonoBehaviour
     {
         GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
+        int[] random_row = ShuffleRange_Int(0, gui.planeRow - 1);
+        int[] random_col = ShuffleRange_Int(0, gui.planeCol - 1);
 
-        for (int i = 0; i < gui.planeRow; i++)
-        for (int j = 0; j < gui.planeCol; j++)
+        foreach (int i in random_row)
+        foreach (int j in random_col)
         {
             if (fm.floor[i,j].transform.childCount <= 0) continue;
 
@@ -90,7 +93,7 @@ public class AgentManager : MonoBehaviour
             if (lastPos[i,j].x == i + m && lastPos[i,j].y == j + n) continue;
             Vector2Int cell = new Vector2Int(i + m, j + n);
 
-            if (ff.isValidCell(cell) && fm.isValidCell(cell))
+            if (ff.isValidCell(cell) && fm.isEmptyCell(cell))
                 possiblePos.Add((cell, ff.ff[cell.x, cell.y]));
         }
 
@@ -108,8 +111,8 @@ public class AgentManager : MonoBehaviour
                 agentTrans.position = fm.floor[cell.x, cell.y].transform.position;
                 agentTrans.position += Vector3.up * agentHeight / 2f;
                 agentTrans.parent = fm.floor[cell.x, cell.y].transform;
-                dff.dff[lastPos[i,j].x, lastPos[i,j].y] += 1f;
-                lastPos[i,j] = cell;
+                dff.dff[i,j] += 1f;
+                lastPos[cell.x,cell.y] = new Vector2Int(i,j);
 
                 if (fm.floor[cell.x, cell.y].transform.tag == "Exit")
                     agentTrans.tag = "ExitAgent";
@@ -117,5 +120,41 @@ public class AgentManager : MonoBehaviour
                 return;
             }
         }
+    }
+
+    void RemoveExitAgents()
+    {
+        GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+        Transform trans;
+
+        foreach (Vector2Int exit in gui.exitPos)
+        {
+            if (fm.floor[exit.x, exit.y].transform.childCount > 0)
+            {
+                trans = fm.floor[exit.x, exit.y].transform.GetChild(0);
+                if (trans.tag == "ExitAgent")
+                    Destroy(trans.gameObject, 0f);
+            }
+        }
+    }
+
+    int[] ShuffleRange_Int(int range_start, int range_end)
+    {
+        int range = range_end - range_start + 1;
+        int[] result = new int[range];
+        int rnd, tmp;
+
+        for (int i = 0; i < range; i++) result[i] = i + range_start;
+
+        for (int i = 0; i < range; i++)
+        {
+            rnd = Random.Range(0, range);
+            tmp = result[rnd];
+            result[rnd] = result[i];
+            result[i] = tmp;
+        }
+
+        return result;
     }
 }

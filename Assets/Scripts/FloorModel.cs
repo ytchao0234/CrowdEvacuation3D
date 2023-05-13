@@ -14,7 +14,6 @@ public class FloorModel : MonoBehaviour
         int planeRow = gui.planeRow;
         int planeCol = gui.planeCol;
         float planeSize = plane.transform.GetComponent<Renderer>().bounds.size.x;
-        Debug.Log("planeSize: " + planeSize);
 
         floor = new GameObject[planeRow, planeCol];
 
