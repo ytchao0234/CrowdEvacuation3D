@@ -23,7 +23,7 @@ public class FloorField : MonoBehaviour
             ff[i,j] = -gui.kS * sff.sff[i,j] - gui.kE * sff_e.sff_e[i,j] + gui.kD * dff.dff[i,j];
         }
 
-        // DrawHeatMap();
+        // DrawHeatMap(ff);
     }
 
     // Update is called once per frame
@@ -42,13 +42,13 @@ public class FloorField : MonoBehaviour
         return flg;
     }
 
-    void DrawHeatMap()
+    public void DrawHeatMap(float[,] src_ff)
     {
         GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
 
-        float min = ff.Cast<float>().Min();
-        float max = ff.Cast<float>().Max();
+        float min = src_ff.Cast<float>().Min();
+        float max = src_ff.Cast<float>().Max();
         float range = max - min;
 
         Gradient gradient = new Gradient();
@@ -80,7 +80,7 @@ public class FloorField : MonoBehaviour
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
-            float value = ((ff[i,j] - min) / range);
+            float value = ((src_ff[i,j] - min) / range);
             fm.floor[i,j].GetComponent<Renderer>().material.color = gradient.Evaluate(value);
         }
     }

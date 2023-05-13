@@ -61,48 +61,6 @@ public class DynamicFloorField : MonoBehaviour
         }
 
         dff = tmp_dff;
-        DrawHeatMap();
-    }
-    void DrawHeatMap()
-    {
-        GUI gui = FindObjectOfType<GUI>();
-        FloorModel fm = FindObjectOfType<FloorModel>();
-
-        float min = dff.Cast<float>().Min();
-        float max = dff.Cast<float>().Max();
-        float range = max - min;
-
-        Gradient gradient = new Gradient();
-
-        // Populate the color keys at the relative time 0 and 1 (0 and 100%)
-        GradientColorKey[] colorKey = new GradientColorKey[6];
-        colorKey[0].color = Color.blue * 0.5f;
-        colorKey[0].time = 0.0f;
-        colorKey[1].color = Color.blue;
-        colorKey[1].time = 0.1f;
-        colorKey[2].color = Color.cyan;
-        colorKey[2].time = 0.4f;
-        colorKey[3].color = Color.yellow;
-        colorKey[3].time = 0.6f;
-        colorKey[4].color = Color.red;
-        colorKey[4].time = 0.9f;
-        colorKey[5].color = Color.red * 0.5f;
-        colorKey[5].time = 1.0f;
-
-        // Populate the alpha keys at relative time 0 and 1  (0 and 100%)
-        GradientAlphaKey[] alphaKey = new GradientAlphaKey[2];
-        alphaKey[0].alpha = 1.0f;
-        alphaKey[0].time = 0.0f;
-        alphaKey[1].alpha = 1.0f;
-        alphaKey[1].time = 1.0f;
-
-        gradient.SetKeys(colorKey, alphaKey);
-
-        for (int i = 0; i < gui.planeRow; i++)
-        for (int j = 0; j < gui.planeCol; j++)
-        {
-            float value = ((dff[i,j] - min) / range);
-            fm.floor[i,j].GetComponent<Renderer>().material.color = gradient.Evaluate(value);
-        }
+        ff.DrawHeatMap(dff);
     }
 }
