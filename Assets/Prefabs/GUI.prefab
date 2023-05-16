@@ -113,3 +113,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81a4638d18b3f6d4b9fabfc68d798f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  planeRow: 30
+  planeCol: 30
+  agentDensity: 0.2
+  exitPos:
+  - {x: 0, y: 15}
+  - {x: 29, y: 13}
+  - {x: 29, y: 14}
+  - {x: 29, y: 15}
+  - {x: 29, y: 16}
+  - {x: 29, y: 17}
+  exitWidth: 
+  totalExitWidth: 0
+  kS: 0
+  kE: 1
+  kD: 0
+  sff_init_value: 1000
+  sff_offset_hv: 1
+  sff_offset_lambda: 1.5
+  dff_decay: 0.8
+  dff_diffuse: 0.8

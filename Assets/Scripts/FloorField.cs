@@ -80,7 +80,11 @@ public class FloorField : MonoBehaviour
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
-            float value = ((src_ff[i,j] - min) / range);
+            float value;
+            if(range == 0.0f)
+                value = 0.0f;
+            else
+                value = ((src_ff[i,j] - min) / range);
             fm.floor[i,j].GetComponent<Renderer>().material.color = gradient.Evaluate(value);
         }
     }

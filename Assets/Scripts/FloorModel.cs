@@ -21,7 +21,7 @@ public class FloorModel : MonoBehaviour
         {
             for (int j = 0; j < planeCol; j ++)
             {
-                Vector3 pos = transform.position + (Vector3.right * i + Vector3.forward * j) * planeSize;
+                Vector3 pos = transform.position + (Vector3.back * i + Vector3.right * j) * planeSize;
                 GameObject obj = GameObject.Instantiate(plane, pos, transform.rotation);
                 obj.transform.parent = transform;
                 floor[i, j] = obj;

@@ -7,7 +7,10 @@ public class AgentManager : MonoBehaviour
     public GameObject agent;
     int agentNumber;
     float agentHeight;
-    Vector2Int[,] lastPos;
+    List<GameObject> agentList = new List<GameObject>();
+    List<Vector2Int> lastPos = new List<Vector2Int>();
+    List<Vector2Int> currentPos = new List<Vector2Int>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,7 +22,6 @@ public class AgentManager : MonoBehaviour
         int planeCol = gui.planeCol;
         agentNumber = Mathf.FloorToInt(planeRow * planeCol * agentDensity);
         agentHeight = agent.transform.GetComponent<Renderer>().bounds.size.y;
-        lastPos = new Vector2Int[planeRow, planeCol];
 
         int[] randomNumbers = new int [planeRow * planeCol];
         for (int k = 0; k < randomNumbers.Length; k ++)
@@ -29,7 +31,7 @@ public class AgentManager : MonoBehaviour
 
         List<int> indexList = new List<int>( randomNumbers );
 
-        for (int k = 0; k < agentNumber; k ++)
+        for (int k = 0; k < agentNumber; )
         {
             int rnd = Random.Range(0, indexList.Count);
             int index = indexList[rnd];
@@ -44,7 +46,10 @@ public class AgentManager : MonoBehaviour
                 obj.transform.position += Vector3.up * agentHeight * 2f;
                 obj.transform.tag = "ActiveAgent";
                 obj.GetComponent<Renderer>().material.color = Color.white;
-                lastPos[i,j] = new Vector2Int(i,j);
+                lastPos.Add(new Vector2Int(i,j));
+                currentPos.Add(new Vector2Int(i,j));
+                agentList.Add(obj);
+                k ++;
             }
         }
     }
@@ -54,32 +59,24 @@ public class AgentManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            AgentMove();
             RemoveExitAgents();
+            AgentMove();
             FindObjectOfType<DynamicFloorField>().UpdateDFF_Diffuse_and_Decay();
         }
     }
 
     void AgentMove()
     {
-        GUI gui = FindObjectOfType<GUI>();
-        FloorModel fm = FindObjectOfType<FloorModel>();
-        int[] random_row = ShuffleRange_Int(0, gui.planeRow - 1);
-        int[] random_col = ShuffleRange_Int(0, gui.planeCol - 1);
+        int[] random_agent = ShuffleRange_Int(0, agentNumber - 1);
 
-        foreach (int i in random_row)
-        foreach (int j in random_col)
+        foreach (int i in random_agent)
         {
-            if (fm.floor[i,j].transform.childCount <= 0) continue;
-
-            Transform trans = fm.floor[i,j].transform.GetChild(0);
-            if (trans.tag != "ActiveAgent") continue;
-
-            AgentMove_OneAgent(i, j, trans);
+            if (agentList[i].transform.tag != "ActiveAgent") continue;
+            AgentMove_OneAgent(i);
         }
     }
 
-    void AgentMove_OneAgent(int i, int j, Transform agentTrans)
+    void AgentMove_OneAgent(int i)
     {
         GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
@@ -91,12 +88,12 @@ public class AgentManager : MonoBehaviour
         for (int m = -1; m <= 1; m++)
         for (int n = -1; n <= 1; n++)
         {
-            Vector2Int cell = new Vector2Int(i + m, j + n);
+            Vector2Int cell = currentPos[i] + new Vector2Int(m, n);
             float ff_value = ff.ff[cell.x, cell.y];
 
             if (ff.isValidCell(cell) && fm.isEmptyCell(cell))
             {
-                if (lastPos[i,j].x == i + m && lastPos[i,j].y == j + n)
+                if (lastPos[i] == cell)
                     ff_value = ff_value - gui.kD;
                 possiblePos.Add((cell, ff_value));
             }
@@ -112,17 +109,18 @@ public class AgentManager : MonoBehaviour
             {
                 int rnd = Random.Range(0, m + 1);
                 Vector2Int cell = possiblePos[rnd].Item1;
-                if (cell.x == i && cell.y == j) return;
+                if (cell == currentPos[i]) return;
     
-                agentTrans.position = fm.floor[cell.x, cell.y].transform.position;
-                agentTrans.position += Vector3.up * agentHeight / 2f;
-                agentTrans.parent = fm.floor[cell.x, cell.y].transform;
+                agentList[i].transform.position = fm.floor[cell.x, cell.y].transform.position;
+                agentList[i].transform.position += Vector3.up * agentHeight / 2f;
+                agentList[i].transform.parent = fm.floor[cell.x, cell.y].transform;
 
-                dff.dff[i,j] += 1f;
-                lastPos[cell.x,cell.y] = new Vector2Int(i,j);
+                dff.dff[currentPos[i].x,currentPos[i].y] += 1f;
+                lastPos[i] = currentPos[i];
+                currentPos[i] = cell;
 
                 if (fm.floor[cell.x, cell.y].transform.tag == "Exit")
-                    agentTrans.tag = "ExitAgent";
+                    agentList[i].transform.tag = "ExitAgent";
 
                 return;
             }
@@ -131,18 +129,19 @@ public class AgentManager : MonoBehaviour
 
     void RemoveExitAgents()
     {
-        GUI gui = FindObjectOfType<GUI>();
-        FloorModel fm = FindObjectOfType<FloorModel>();
-        Transform trans;
 
-        foreach (Vector2Int exit in gui.exitPos)
+        for(int i=0;i<agentNumber;)
         {
-            if (fm.floor[exit.x, exit.y].transform.childCount > 0)
+            if(agentList[i].transform.tag == "ExitAgent")
             {
-                trans = fm.floor[exit.x, exit.y].transform.GetChild(0);
-                if (trans.tag == "ExitAgent")
-                    Destroy(trans.gameObject, 0f);
+                DestroyImmediate(agentList[i]);
+                agentList.RemoveAt(i);
+                lastPos.RemoveAt(i);
+                currentPos.RemoveAt(i);
+                agentNumber--;
             }
+            else
+                i++;
         }
     }
 
