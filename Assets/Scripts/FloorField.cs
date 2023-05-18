@@ -10,13 +10,24 @@ public class FloorField : MonoBehaviour
     void Start()
     {
         GUI gui = FindObjectOfType<GUI>();
+
+        ff = new float[gui.planeRow, gui.planeCol];
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    public void Compute()
+    {
+        GUI gui = FindObjectOfType<GUI>();
         StaticFloorField sff = FindObjectOfType<StaticFloorField>();
         StaticFloorField_ExitWidth sff_e = FindObjectOfType<StaticFloorField_ExitWidth>();
         DynamicFloorField dff = FindObjectOfType<DynamicFloorField>();
         FloorModel fm = FindObjectOfType<FloorModel>();
 
-        ff = new float[gui.planeRow, gui.planeCol];
-        
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
@@ -26,11 +37,6 @@ public class FloorField : MonoBehaviour
         // DrawHeatMap(ff);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public bool isValidCell(Vector2Int cell)
     {
         GUI gui = FindObjectOfType<GUI>();

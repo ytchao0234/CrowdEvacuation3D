@@ -10,21 +10,29 @@ public class DynamicFloorField : MonoBehaviour
     void Start()
     {
         GUI gui = FindObjectOfType<GUI>();
-        Vector2Int[] exitPos = gui.exitPos;
         dff = new float[gui.planeRow, gui.planeCol];
-
-        // Set initial values
-        for (int i = 0; i < gui.planeRow; i++)
-        for (int j = 0; j < gui.planeCol; j++)
-        {
-            dff[i, j] = 0f;
-        }
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    public void Setup()
+    {
+        Reset();
+    }
+
+    public void Reset()
+    {
+        GUI gui = FindObjectOfType<GUI>();
+        // Set initial values
+        for (int i = 0; i < gui.planeRow; i++)
+        for (int j = 0; j < gui.planeCol; j++)
+        {
+            dff[i, j] = 0f;
+        }
     }
 
     public void UpdateDFF_Diffuse_and_Decay()

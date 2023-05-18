@@ -14,6 +14,23 @@ public class AgentManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Setup();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            FindObjectOfType<FloorField>().Compute();
+            RemoveExitAgents();
+            AgentMove();
+            FindObjectOfType<DynamicFloorField>().UpdateDFF_Diffuse_and_Decay();
+        }
+    }
+
+    public void Setup()
+    {
         GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
     
@@ -54,15 +71,19 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Reset()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        agentNumber = 0;
+        agentHeight = 0;
+
+        for (int i = 0; i < agentList.Count; i++)
         {
-            RemoveExitAgents();
-            AgentMove();
-            FindObjectOfType<DynamicFloorField>().UpdateDFF_Diffuse_and_Decay();
+            // DestroyImmediate(agentList[i]);
+            Destroy(agentList[i], 0f);
         }
+        agentList.Clear();
+        lastPos.Clear();
+        currentPos.Clear();
     }
 
     void AgentMove()

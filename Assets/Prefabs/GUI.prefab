@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3111374336252732847}
   - component: {fileID: 5048900114921171544}
   - component: {fileID: 4987066104216828454}
+  - component: {fileID: 1836755643135728232}
   - component: {fileID: 3206532417154539840}
   m_Layer: 5
   m_Name: GUI
@@ -101,6 +102,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &1836755643135728232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 883187118079959888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8633b86c70e887147b2c2c2f05e336b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3206532417154539840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,6 +136,10 @@ MonoBehaviour:
   - {x: 29, y: 15}
   - {x: 29, y: 16}
   - {x: 29, y: 17}
+  exit_param_top: []
+  exit_param_bottom: []
+  exit_param_left: []
+  exit_param_right: []
   exitWidth: 
   totalExitWidth: 0
   kS: 0

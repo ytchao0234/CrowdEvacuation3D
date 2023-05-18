@@ -40,6 +40,17 @@ public class FloorModel : MonoBehaviour
         
     }
 
+    public void Reset()
+    {
+        GUI gui = FindObjectOfType<GUI>();
+
+        for (int i = 0; i < gui.planeRow; i++)
+        for (int j = 0; j < gui.planeCol; j++)
+        {
+            floor[i,j].GetComponent<Renderer>().material.color = Color.white;
+        }
+    }
+
     public bool isEmptyCell(Vector2Int cell)
     {
         return floor[cell.x, cell.y].transform.childCount == 0;

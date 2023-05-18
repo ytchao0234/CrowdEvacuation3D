@@ -9,10 +9,26 @@ public class StaticFloorField_ExitWidth : MonoBehaviour
     void Start()
     {
         GUI gui = FindObjectOfType<GUI>();
+        sff_e = new float[gui.planeRow, gui.planeCol];
+        Setup();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    public void Setup()
+    {
+        Reset();
+    }
+
+    public void Reset()
+    {
+        GUI gui = FindObjectOfType<GUI>();
         Vector2Int[] exitPos = gui.exitPos;
         int[] exitWidth = gui.exitWidth;
-        sff_e = new float[gui.planeRow, gui.planeCol];
-
         // Set initial values
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
@@ -25,12 +41,6 @@ public class StaticFloorField_ExitWidth : MonoBehaviour
             sff_e[exitPos[i].x, exitPos[i].y] = 0;
             SetSFFE_OneExit(exitPos[i], exitWidth[i]);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     void SetSFFE_OneExit(Vector2Int exitPos, int exitWidth)

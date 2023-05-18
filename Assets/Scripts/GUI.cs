@@ -36,6 +36,24 @@ public class GUI : MonoBehaviour
         
     }
 
+    public void Setup()
+    {
+       FindObjectOfType<AgentManager>().Setup();
+       FindObjectOfType<DynamicFloorField>().Setup();
+       FindObjectOfType<StaticFloorField>().Setup();
+       FindObjectOfType<StaticFloorField_ExitWidth>().Setup();
+    }
+
+    public void Reset()
+    {
+       FindObjectOfType<AgentManager>().Reset();
+       FindObjectOfType<FloorModel>().Reset();
+       FindObjectOfType<DynamicFloorField>().Reset();
+       FindObjectOfType<StaticFloorField>().Reset();
+       FindObjectOfType<StaticFloorField_ExitWidth>().Reset();
+       FindObjectOfType<ObstacleModel>().Reset();
+    }
+
     void SetupExitWidth()
     {
         exitWidth = new int[exitPos.Length];

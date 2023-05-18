@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 8633b86c70e887147b2c2c2f05e336b0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - checkbox: {fileID: 3842108846642927953, guid: 8cda85c130e26ed4eba22e19878a0c28, type: 3}
+  - SaveBtn: {fileID: 7915759778152411711, guid: 5940e31c05619b2489bf5d6dd3e01515, type: 3}
+  executionOrder: 220
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
