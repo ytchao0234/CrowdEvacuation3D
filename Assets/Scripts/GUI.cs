@@ -10,10 +10,10 @@ public class GUI : MonoBehaviour
     public int planeCol = 30;
     public float agentDensity = 0.2f;
     public Vector2Int[] exitPos;
-    public List<ExitParameter> exit_param_top;
-    public List<ExitParameter> exit_param_bottom;
-    public List<ExitParameter> exit_param_left;
-    public List<ExitParameter> exit_param_right;
+    // public List<ExitParameter> exit_param_top;
+    // public List<ExitParameter> exit_param_bottom;
+    // public List<ExitParameter> exit_param_left;
+    // public List<ExitParameter> exit_param_right;
     public int[] exitWidth;
     public int totalExitWidth = 0;
     public float kS = 0.0f, kE = 1.0f, kD = 0.0f;
@@ -26,8 +26,8 @@ public class GUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        exitPos = GenExit();
-        SetupExitWidth();
+        // exitPos = GenExit();
+        // SetupExitWidth();
     }
 
     // Update is called once per frame
@@ -38,7 +38,9 @@ public class GUI : MonoBehaviour
 
     public void Setup()
     {
+       SetupExitWidth();
        FindObjectOfType<AgentManager>().Setup();
+       FindObjectOfType<FloorModel>().Setup();
        FindObjectOfType<DynamicFloorField>().Setup();
        FindObjectOfType<StaticFloorField>().Setup();
        FindObjectOfType<StaticFloorField_ExitWidth>().Setup();
@@ -46,12 +48,13 @@ public class GUI : MonoBehaviour
 
     public void Reset()
     {
+       FindObjectOfType<ObstacleModel>().Reset();
        FindObjectOfType<AgentManager>().Reset();
        FindObjectOfType<FloorModel>().Reset();
        FindObjectOfType<DynamicFloorField>().Reset();
        FindObjectOfType<StaticFloorField>().Reset();
        FindObjectOfType<StaticFloorField_ExitWidth>().Reset();
-       FindObjectOfType<ObstacleModel>().Reset();
+       
     }
 
     void SetupExitWidth()
@@ -102,7 +105,7 @@ public class GUI : MonoBehaviour
             totalExitWidth += width;
         }
     }
-
+/*
     Vector2Int[] GenExit()
     {
         List<Vector2Int> exitResult = new List<Vector2Int>();
@@ -190,7 +193,7 @@ public class GUI : MonoBehaviour
 
         return new Vector2Int(start,end);
         
-    }
+    }*/
 }
 
 

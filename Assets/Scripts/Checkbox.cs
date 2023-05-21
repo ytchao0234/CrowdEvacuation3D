@@ -8,7 +8,7 @@ public class Checkbox : MonoBehaviour
     public int i, j;
     public int select = 0; // Empty, Movable, Immovable
     int selectNumber = 3;
-    string type = ""; // Valid, Bound, Exit
+    public string type = ""; // Valid, Bound, Exit
     Button checkbtn;
 
     // Start is called before the first frame update
@@ -30,23 +30,19 @@ public class Checkbox : MonoBehaviour
         this.i = i;
         this.j = j;
         this.select = 0;
-        this.type = "Valid";
+        if (!(this.i == 0 || this.i == gui.planeRow - 1 || this.j == 0 || this.j == gui.planeCol - 1))
+            this.type = "Valid";
         SetButtonColor(Color.white);
         SetOnclickCallback();
-
+        SetExitOnclickCallback();
+        
         if (this.i == 0 || this.i == gui.planeRow - 1 || this.j == 0 || this.j == gui.planeCol - 1)
         {
-            if (fm.floor[i, j].transform.tag == "Exit")
-            {
-                type = "Exit";
-                SetButtonColor(Color.green * 0.8f);
-            }
-            else
-            {
-                type = "Bound";
-                SetButtonColor(Color.gray);
-            }
+            type = "Bound";
+            SetButtonColor(Color.gray);
+            fm.floor[i, j].transform.tag = "ImmovableObstacle";
         }
+
     }
 
     void SetButtonColor(Color color)
@@ -85,6 +81,34 @@ public class Checkbox : MonoBehaviour
                 break;
             default:
                 break;
+        }
+
+    }
+
+    public void SetExitOnclickCallback()
+    {
+        GetComponent<Button>().onClick.AddListener(ExitCheckboxOnClick);
+    }
+
+     void ExitCheckboxOnClick()
+    {
+        GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+        Debug.Log(i.ToString() + ", " + j.ToString());
+        Vector2Int temp = new Vector2Int(i,j);
+        if (type == "Valid") return;
+
+        if (fm.floor[i, j].transform.tag == "Exit")
+        {
+            type = "Bound";
+            SetButtonColor(Color.gray);
+            fm.floor[i, j].transform.tag = "ImmovableObstacle";
+        }
+        else
+        {
+            type = "Exit";
+            SetButtonColor(Color.green * 0.8f);
+            fm.floor[i, j].transform.tag = "Exit";
         }
 
     }

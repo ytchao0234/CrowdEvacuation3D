@@ -11,7 +11,7 @@ public class StaticFloorField : MonoBehaviour
         GUI gui = FindObjectOfType<GUI>();
         sff = new float[gui.planeRow, gui.planeCol];
 
-        Setup();
+        //Setup();
     }
 
     // Update is called once per frame
@@ -23,12 +23,18 @@ public class StaticFloorField : MonoBehaviour
     public void Setup()
     {
         Reset();
+        GUI gui = FindObjectOfType<GUI>();
+        Vector2Int[] exitPos = gui.exitPos;
+        for (int i = 0; i < exitPos.Length; i++)
+        {
+            sff[exitPos[i].x, exitPos[i].y] = 0;
+            SetSFF_OneExit(exitPos[i]);
+        }
     }
 
     public void Reset()
     {
         GUI gui = FindObjectOfType<GUI>();
-        Vector2Int[] exitPos = gui.exitPos;
         // Set initial values
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
@@ -36,11 +42,7 @@ public class StaticFloorField : MonoBehaviour
             sff[i, j] = gui.sff_init_value;
         }
 
-        for (int i = 0; i < exitPos.Length; i++)
-        {
-            sff[exitPos[i].x, exitPos[i].y] = 0;
-            SetSFF_OneExit(exitPos[i]);
-        }
+
     }
 
     void SetSFF_OneExit(Vector2Int exitPos)

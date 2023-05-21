@@ -28,10 +28,7 @@ public class FloorModel : MonoBehaviour
             }
         }
 
-        foreach (Vector2Int exit in gui.exitPos)
-        {
-            floor[exit.x, exit.y].transform.tag = "Exit";
-        }
+        
     }
 
     // Update is called once per frame
@@ -39,7 +36,14 @@ public class FloorModel : MonoBehaviour
     {
         
     }
-
+    public void Setup()
+    {
+        GUI gui = FindObjectOfType<GUI>();
+        foreach (Vector2Int exit in gui.exitPos)
+        {
+            floor[exit.x, exit.y].transform.tag = "Exit";
+        }
+    }
     public void Reset()
     {
         GUI gui = FindObjectOfType<GUI>();
