@@ -5,6 +5,7 @@ using UnityEngine;
 public class StaticFloorField : MonoBehaviour
 {
     public float[,] sff;
+    float max_value;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,11 +31,23 @@ public class StaticFloorField : MonoBehaviour
             sff[exitPos[i].x, exitPos[i].y] = 0;
             SetSFF_OneExit(exitPos[i]);
         }
+        foreach(float value in sff)
+        {
+            if(value < gui.sff_init_value && value > max_value)
+                max_value = value;
+        }
+        for(int i=0;i<gui.planeRow;i++)
+        for(int j=0;j<gui.planeCol;j++)
+        {
+            if(sff[i,j] >= gui.sff_init_value)
+                sff[i,j] = max_value;
+        }
     }
 
     public void Reset()
     {
         GUI gui = FindObjectOfType<GUI>();
+        max_value = 0f;
         // Set initial values
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
@@ -49,6 +62,7 @@ public class StaticFloorField : MonoBehaviour
     {
         GUI gui = FindObjectOfType<GUI>();
         FloorField ff = FindObjectOfType<FloorField>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
 
         float offset_hv = gui.sff_offset_hv;
         float offset_d = offset_hv * gui.sff_offset_lambda;
@@ -68,7 +82,7 @@ public class StaticFloorField : MonoBehaviour
 
                 adjCell = curCell + new Vector2Int(i, j);
 
-                if (ff.isValidCell(adjCell))
+                if (ff.isValidCell(adjCell) && !fm.isObstacleCell(adjCell))
                 {
                     float offset = (i == 0 || j == 0) ? offset_hv : offset_d;
 
@@ -79,6 +93,7 @@ public class StaticFloorField : MonoBehaviour
                     }
                 }
             }
+
         }
     }
 }

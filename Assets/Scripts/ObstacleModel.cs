@@ -9,6 +9,10 @@ public class ObstacleModel : MonoBehaviour
     public GameObject obstacle;
     float obstacleSize;
     List<GameObject> obstacleList;
+    List<Vector2Int> currentPos;
+    List<int> influenceRadiusList;
+    List<List<int>> inRangeList;
+    List<int> volunteerList;
     List<GameObject> wallList;
 
     // Start is called before the first frame update
@@ -18,7 +22,11 @@ public class ObstacleModel : MonoBehaviour
         FloorModel fm = FindObjectOfType<FloorModel>();
         
         obstacleList = new List<GameObject>();
+        currentPos = new List<Vector2Int>();
         wallList = new List<GameObject>();
+        influenceRadiusList = new List<int>();
+        inRangeList = new List<List<int>>();
+        volunteerList = new List<int>();
         obstacleSize = obstacle.transform.GetComponent<Renderer>().bounds.size.x;
         float planeSize = fm.plane.transform.GetComponent<Renderer>().bounds.size.x;
         List<Vector2Int> boundPos = new List<Vector2Int>();
@@ -54,6 +62,11 @@ public class ObstacleModel : MonoBehaviour
         
     }
 
+    public void Setup()
+    {
+        SetupInRange();
+    }
+
     public void Reset()
     {
         for (int i = 0; i < obstacleList.Count; i++)
@@ -66,6 +79,10 @@ public class ObstacleModel : MonoBehaviour
             Destroy(wallList[i], 0f);
         }
         obstacleList.Clear();
+        currentPos.Clear();
+        inRangeList.Clear();
+        volunteerList.Clear();
+        influenceRadiusList.Clear();
         wallList.Clear();
     }
 
@@ -82,7 +99,13 @@ public class ObstacleModel : MonoBehaviour
         if(i == 0 || i == gui.planeRow - 1 || j == 0 || j == gui.planeCol - 1)
             wallList.Add(obj);
         else
+        {
             obstacleList.Add(obj);
+            currentPos.Add(new Vector2Int(i,j));
+            inRangeList.Add(new List<int>());
+            volunteerList.Add(-1);
+            influenceRadiusList.Add(1);
+        }
     }
 
     public void SetObstaclesFromGUI()
@@ -138,6 +161,36 @@ public class ObstacleModel : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    void SetupInRange()
+    {
+        FloorField ff = FindObjectOfType<FloorField>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+        AgentManager am = FindObjectOfType<AgentManager>();
+
+        for (int i = 0; i < obstacleList.Count; i++)
+        {
+            if (obstacleList[i].transform.tag != "MovableObstacle")
+                continue;
+
+            int r = influenceRadiusList[i];
+            for (int j = -r; j <=r ; j++)
+            for (int k = -r; k <=r ; k++)
+            {
+                Vector2Int cell = currentPos[i] + new Vector2Int(j, k);
+
+                if (ff.isValidCell(cell) && fm.isAgentCell(cell))
+                {
+                    int idx = am.GetIndexFromCell(cell);
+                    if (idx >= 0)
+                    {
+                        inRangeList[i].Add(idx);
+                        Debug.Log("inRangeList[" + i.ToString() + "]: " + idx.ToString());
+                    }
+                }
+            }
         }
     }
 }

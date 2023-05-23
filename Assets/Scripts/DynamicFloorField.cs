@@ -39,12 +39,23 @@ public class DynamicFloorField : MonoBehaviour
     {
         GUI gui = FindObjectOfType<GUI>();
         FloorField ff = FindObjectOfType<FloorField>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
         float[,] tmp_dff = new float[gui.planeRow, gui.planeCol];
 
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
+
             Vector2Int curCell = new Vector2Int(i, j);
+            if(!fm.isEmptyCell(curCell) && fm.floor[i,j].transform.GetChild(0).tag == "ImmovableObstacle")
+            {
+                continue;
+            }
+            else if(!fm.isEmptyCell(curCell) && fm.floor[i,j].transform.GetChild(0).tag == "MovableObstacle")
+            {
+                tmp_dff[curCell.x, curCell.y] = (1f - gui.dff_decay) * dff[i,j];
+                continue;
+            }
             Vector2Int adjCell = curCell;
 
             for (int ii = -1; ii <= 1; ii++)
@@ -69,6 +80,6 @@ public class DynamicFloorField : MonoBehaviour
         }
 
         dff = tmp_dff;
-        ff.DrawHeatMap(dff);
+        
     }
 }

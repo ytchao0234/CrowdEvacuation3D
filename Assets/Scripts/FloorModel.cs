@@ -21,7 +21,7 @@ public class FloorModel : MonoBehaviour
         {
             for (int j = 0; j < planeCol; j ++)
             {
-                Vector3 pos = transform.position + (Vector3.back * i + Vector3.right * j) * planeSize;
+                Vector3 pos = transform.position + (Vector3.back * (i - planeRow / 2) + Vector3.right * (j - planeCol / 2)) * planeSize;
                 GameObject obj = GameObject.Instantiate(plane, pos, transform.rotation);
                 obj.transform.parent = transform;
                 floor[i, j] = obj;
@@ -64,13 +64,22 @@ public class FloorModel : MonoBehaviour
     {
         return floor[cell.x, cell.y].transform.tag == "Exit";
     }
-    public bool isValidCell(Vector2Int cell)
+
+    public bool isAgentCell(Vector2Int cell)
     {
         bool flg = isEmptyCell(cell);
-        if (flg) return flg;
+        if (flg) return !flg;
 
-        flg  = floor[cell.x, cell.y].transform.GetChild(0).tag != "MovableObstacle";
-        flg &= floor[cell.x, cell.y].transform.GetChild(0).tag != "ImmovableObstacle";
+        return floor[cell.x, cell.y].transform.GetChild(0).tag == "ActiveAgent";
+    }
+
+    public bool isObstacleCell(Vector2Int cell)
+    {
+        bool flg = isEmptyCell(cell);
+        if (flg) return !flg;
+
+        flg  = floor[cell.x, cell.y].transform.GetChild(0).tag == "MovableObstacle";
+        flg |= floor[cell.x, cell.y].transform.GetChild(0).tag == "ImmovableObstacle";
 
         return flg;
     }

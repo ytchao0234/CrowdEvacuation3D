@@ -33,8 +33,6 @@ public class FloorField : MonoBehaviour
         {
             ff[i,j] = -gui.kS * sff.sff[i,j] - gui.kE * sff_e.sff_e[i,j] + gui.kD * dff.dff[i,j];
         }
-
-        // DrawHeatMap(ff);
     }
 
     public bool isValidCell(Vector2Int cell)

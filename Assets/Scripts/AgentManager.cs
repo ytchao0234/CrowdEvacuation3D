@@ -10,6 +10,8 @@ public class AgentManager : MonoBehaviour
     List<GameObject> agentList = new List<GameObject>();
     List<Vector2Int> lastPos = new List<Vector2Int>();
     List<Vector2Int> currentPos = new List<Vector2Int>();
+    List<List<int>> whiteList = new List<List<int>>();
+    List<List<int>> blackList = new List<List<int>>();
 
     // Start is called before the first frame update
     void Start()
@@ -26,6 +28,7 @@ public class AgentManager : MonoBehaviour
             RemoveExitAgents();
             AgentMove();
             FindObjectOfType<DynamicFloorField>().UpdateDFF_Diffuse_and_Decay();
+            FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<DynamicFloorField>().dff);
         }
     }
 
@@ -92,8 +95,14 @@ public class AgentManager : MonoBehaviour
 
         foreach (int i in random_agent)
         {
-            if (agentList[i].transform.tag != "ActiveAgent") continue;
+            // if (agentList[i].transform.tag != "ActiveAgent") continue;
             AgentMove_OneAgent(i);
+        }
+
+        foreach (int i in random_agent)
+        {
+            // if (agentList[i].transform.tag != "ActiveAgent") continue;
+            StartCoroutine(AgentMove_Animation(i, 0f));
         }
     }
 
@@ -131,10 +140,6 @@ public class AgentManager : MonoBehaviour
                 int rnd = Random.Range(0, m + 1);
                 Vector2Int cell = possiblePos[rnd].Item1;
                 if (cell == currentPos[i]) return;
-    
-                agentList[i].transform.position = fm.floor[cell.x, cell.y].transform.position;
-                agentList[i].transform.position += Vector3.up * agentHeight / 2f;
-                agentList[i].transform.parent = fm.floor[cell.x, cell.y].transform;
 
                 dff.dff[currentPos[i].x,currentPos[i].y] += 1f;
                 lastPos[i] = currentPos[i];
@@ -183,5 +188,35 @@ public class AgentManager : MonoBehaviour
         }
 
         return result;
+    }
+
+    IEnumerator AgentMove_Animation(int i, float delay = 0f)
+    {
+        yield return new WaitForSeconds(delay);
+
+        FloorModel fm = FindObjectOfType<FloorModel>();
+
+        float timer = 0.0f;
+        float duration = 0.8f;
+        Vector2Int lastCell = lastPos[i];
+        Vector2Int curCell = currentPos[i];
+        Vector3 last = fm.floor[lastCell.x, lastCell.y].transform.position;
+        Vector3 current = fm.floor[curCell.x, curCell.y].transform.position;
+
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            agentList[i].transform.position = Vector3.Lerp(last, current, timer/duration);
+            yield return null;
+        }
+
+        agentList[i].transform.parent = fm.floor[curCell.x, curCell.y].transform;
+        yield break;
+    }
+
+    public int GetIndexFromCell(Vector2Int cell)
+    {
+        int idx = currentPos.FindIndex(pos => pos == cell);
+        return idx;
     }
 }
