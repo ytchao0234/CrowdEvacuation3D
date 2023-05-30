@@ -155,6 +155,7 @@ public class AgentManager : MonoBehaviour
                 dff.dff[currentPos[i].x,currentPos[i].y] += 1f;
                 lastPos[i] = currentPos[i];
                 currentPos[i] = cell;
+                agentList[i].transform.parent = fm.floor[cell.x, cell.y].transform;
 
                 if (fm.floor[cell.x, cell.y].transform.tag == "Exit")
                     SetAgentType(agentList[i],"ExitAgent");
@@ -221,7 +222,6 @@ public class AgentManager : MonoBehaviour
             yield return null;
         }
 
-        agentList[i].transform.parent = fm.floor[curCell.x, curCell.y].transform;
         yield break;
     }
 
