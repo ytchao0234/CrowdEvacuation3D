@@ -7,11 +7,13 @@ public class AgentManager : MonoBehaviour
     public GameObject agent;
     int agentNumber;
     float agentHeight;
-    List<GameObject> agentList = new List<GameObject>();
+    public List<GameObject> agentList = new List<GameObject>();
     List<Vector2Int> lastPos = new List<Vector2Int>();
-    List<Vector2Int> currentPos = new List<Vector2Int>();
-    List<List<int>> whiteList = new List<List<int>>();
-    List<List<int>> blackList = new List<List<int>>();
+    public List<Vector2Int> currentPos = new List<Vector2Int>();
+    public List<List<int>> whiteList = new List<List<int>>();
+    public List<List<int>> blackList = new List<List<int>>();
+    public List<string> volunteerStrategy = new List<string>();
+    public List<int> inChargeOfList = new List<int>();
 
     // Start is called before the first frame update
     void Start()
@@ -64,14 +66,19 @@ public class AgentManager : MonoBehaviour
                 GameObject obj = GameObject.Instantiate(agent, fm.floor[i, j].transform);
                 obj.transform.localScale = Vector3.one * 4f;
                 obj.transform.position += Vector3.up * agentHeight * 2f;
-                obj.transform.tag = "ActiveAgent";
-                obj.GetComponent<Renderer>().material.color = Color.white;
+                SetAgentType(obj,"ActiveAgent");
                 lastPos.Add(new Vector2Int(i,j));
                 currentPos.Add(new Vector2Int(i,j));
                 agentList.Add(obj);
+                whiteList.Add(new List<int>());
+                blackList.Add(new List<int>());
+                volunteerStrategy.Add("C");
+                inChargeOfList.Add(gui.Not_Assign);
                 k ++;
             }
         }
+
+
     }
 
     public void Reset()
@@ -81,12 +88,16 @@ public class AgentManager : MonoBehaviour
 
         for (int i = 0; i < agentList.Count; i++)
         {
-            // DestroyImmediate(agentList[i]);
-            Destroy(agentList[i], 0f);
+            DestroyImmediate(agentList[i]);
+            // Destroy(agentList[i], 0f);
         }
         agentList.Clear();
         lastPos.Clear();
         currentPos.Clear();
+        volunteerStrategy.Clear();
+        whiteList.Clear();
+        blackList.Clear();
+        inChargeOfList.Clear();
     }
 
     void AgentMove()
@@ -121,7 +132,7 @@ public class AgentManager : MonoBehaviour
             Vector2Int cell = currentPos[i] + new Vector2Int(m, n);
             float ff_value = ff.ff[cell.x, cell.y];
 
-            if (ff.isValidCell(cell) && fm.isEmptyCell(cell))
+            if (fm.isValidCell(cell) && fm.isEmptyCell(cell))
             {
                 if (lastPos[i] == cell)
                     ff_value = ff_value - gui.kD;
@@ -146,7 +157,7 @@ public class AgentManager : MonoBehaviour
                 currentPos[i] = cell;
 
                 if (fm.floor[cell.x, cell.y].transform.tag == "Exit")
-                    agentList[i].transform.tag = "ExitAgent";
+                    SetAgentType(agentList[i],"ExitAgent");
 
                 return;
             }
@@ -218,5 +229,26 @@ public class AgentManager : MonoBehaviour
     {
         int idx = currentPos.FindIndex(pos => pos == cell);
         return idx;
+    }
+
+    public void SetAgentType(GameObject agent, string type)
+    {
+        switch (type)
+        {
+            case "ActiveAgent":
+                agent.transform.tag = type;
+                agent.GetComponent<Renderer>().material.color = Color.gray;
+                break;
+            case "ExitAgent":
+                agent.transform.tag = type;
+                agent.GetComponent<Renderer>().material.color = Color.gray;
+                break;
+            case "Volunteer":
+                agent.transform.tag = type;
+                agent.GetComponent<Renderer>().material.color = Color.blue;
+                break;
+            default:
+                break;
+        }
     }
 }

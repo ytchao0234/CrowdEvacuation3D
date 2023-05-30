@@ -55,6 +55,17 @@ public class FloorModel : MonoBehaviour
         }
     }
 
+    public bool isValidCell(Vector2Int cell)
+    {
+        GUI gui = FindObjectOfType<GUI>();
+
+        bool flg = true;
+        flg &= cell.x >= 0 && cell.x < gui.planeRow;
+        flg &= cell.y >= 0 && cell.y < gui.planeCol;
+
+        return flg;
+    }
+
     public bool isEmptyCell(Vector2Int cell)
     {
         return floor[cell.x, cell.y].transform.childCount == 0;
@@ -80,7 +91,18 @@ public class FloorModel : MonoBehaviour
 
         flg  = floor[cell.x, cell.y].transform.GetChild(0).tag == "MovableObstacle";
         flg |= floor[cell.x, cell.y].transform.GetChild(0).tag == "ImmovableObstacle";
+        flg |= floor[cell.x, cell.y].transform.GetChild(0).tag == "AssignedObstacle";
 
         return flg;
+    }
+
+    public bool isNotImmovableExitCell(Vector2Int cell)
+    {
+        bool flg;
+
+        flg  = floor[cell.x, cell.y].transform.tag == "Exit";
+        flg |= !isEmptyCell(cell) && floor[cell.x, cell.y].transform.GetChild(0).tag == "ImmovableObstacle";
+
+        return !flg;
     }
 }

@@ -763,7 +763,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: agentDensity
-      value: 0.05
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: exitPos.Array.size

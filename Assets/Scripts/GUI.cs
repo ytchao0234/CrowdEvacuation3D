@@ -10,6 +10,7 @@ public class GUI : MonoBehaviour
     public int planeCol = 30;
     public float agentDensity = 0.2f;
     public Vector2Int[] exitPos;
+    public List<List<int>> exit_group = new List<List<int>>();
     // public List<ExitParameter> exit_param_top;
     // public List<ExitParameter> exit_param_bottom;
     // public List<ExitParameter> exit_param_left;
@@ -22,6 +23,7 @@ public class GUI : MonoBehaviour
     public float sff_offset_lambda = 1.5f;
     public float dff_decay = 0.3f;
     public float dff_diffuse = 0.8f;
+    public int Not_Assign = -1;
 
     // Start is called before the first frame update
     void Start()
@@ -91,20 +93,35 @@ public class GUI : MonoBehaviour
 
         // Calculate group size (exit width)
         HashSet<int> groups = new HashSet<int>(exitWidth);
+        Dictionary<int,List<int>> dict = new Dictionary<int,List<int>>();
+        
 
         foreach (int id in groups)
         {
             int width = 0;
-
+            dict.Add(id,new List<int>());
             for (int i = 0; i < exitWidth.Length; i++)
                 if (exitWidth[i] == id)
+                {
                     width ++;
+                    dict[id].Add(i);
+                }     
             for (int i = 0; i < exitWidth.Length; i++)
                 if (exitWidth[i] == id)
                     exitWidth[i] = width;
 
             totalExitWidth += width;
         }
+
+        
+        exit_group = dict.Values.ToList();
+        // foreach(var id in dict.ToList())
+        // {
+        //     Debug.Log(id.Key.ToString());
+        //     foreach(int value in id.Value)
+        //         Debug.Log(value.ToString());
+
+        // }
     }
 /*
     Vector2Int[] GenExit()

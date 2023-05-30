@@ -9,6 +9,8 @@ TagManager:
   - Exit
   - MovableObstacle
   - ImmovableObstacle
+  - AssignedObstacle
+  - Volunteer
   layers:
   - Default
   - TransparentFX

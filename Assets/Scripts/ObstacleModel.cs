@@ -65,18 +65,21 @@ public class ObstacleModel : MonoBehaviour
     public void Setup()
     {
         SetupInRange();
+        SetWhiteBlackList();
+        SetVolunteer();
     }
 
     public void Reset()
     {
         for (int i = 0; i < obstacleList.Count; i++)
         {
-            // DestroyImmediate(obstacleList[i]);
-            Destroy(obstacleList[i], 0f);
+            DestroyImmediate(obstacleList[i]);
+            // Destroy(obstacleList[i], 0f);
         }
         for(int i=0; i< wallList.Count;i++)
         {
-            Destroy(wallList[i], 0f);
+            DestroyImmediate(wallList[i]);
+            // Destroy(wallList[i], 0f);
         }
         obstacleList.Clear();
         currentPos.Clear();
@@ -159,6 +162,10 @@ public class ObstacleModel : MonoBehaviour
                 obj.transform.tag = type;
                 obj.GetComponent<Renderer>().material.color = Color.cyan * 0.8f;
                 break;
+            case "AssignedObstacle":
+                obj.transform.tag = type;
+                obj.GetComponent<Renderer>().material.color = Color.yellow * 0.8f;
+                break;
             default:
                 break;
         }
@@ -181,7 +188,7 @@ public class ObstacleModel : MonoBehaviour
             {
                 Vector2Int cell = currentPos[i] + new Vector2Int(j, k);
 
-                if (ff.isValidCell(cell) && fm.isAgentCell(cell))
+                if (fm.isValidCell(cell) && fm.isAgentCell(cell))
                 {
                     int idx = am.GetIndexFromCell(cell);
                     if (idx >= 0)
@@ -192,5 +199,176 @@ public class ObstacleModel : MonoBehaviour
                 }
             }
         }
+    }
+
+    void SetWhiteBlackList()
+    {
+        AgentManager am = FindObjectOfType<AgentManager>();
+        for(int i = 0; i < obstacleList.Count; i++)
+        {
+            if(obstacleList[i].transform.tag != "MovableObstacle")
+            {
+                continue;
+            }
+            float tau = CalcBlockedProportion(i);
+            Debug.Log("tau: " + tau.ToString());
+            if(tau < 1f)
+            {
+                float factor = Mathf.Pow(1f - tau, 1f / inRangeList[i].Count);
+                SolveConflictVolunteer(inRangeList[i], factor);
+                foreach(int agent_idx in inRangeList[i])
+                {
+                    if(am.whiteList[agent_idx].Contains(i))
+                        am.whiteList[agent_idx].Remove(i);
+                    if(am.blackList[agent_idx].Contains(i))
+                        am.blackList[agent_idx].Remove(i);
+
+                    if(am.volunteerStrategy[agent_idx] == "C")
+                        am.blackList[agent_idx].Add(i);
+                    else
+                        am.whiteList[agent_idx].Add(i);
+                }
+            }
+            else
+            {
+                foreach(int agent_idx in inRangeList[i])
+                {
+                    if(am.blackList[agent_idx].Contains(i))
+                        am.blackList[agent_idx].Remove(i);
+                    if(!am.whiteList[agent_idx].Contains(i))
+                        am.whiteList[agent_idx].Add(i);
+                }
+            }
+
+        }
+    }
+
+    float CalcBlockedProportion(int obstacle_idx)
+    {
+        GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+
+        foreach(List<int> exit in gui.exit_group)
+        {
+            bool isBlocked = false;
+            foreach(int exit_idx in exit)
+            {
+                if(Mathf.Abs(currentPos[obstacle_idx].x - gui.exitPos[exit_idx].x) <= 1 &&
+                    Mathf.Abs(currentPos[obstacle_idx].y - gui.exitPos[exit_idx].y) <= 1)
+                   isBlocked = true;
+            }
+            if(!isBlocked)
+                continue;
+            List<Vector2Int> neighbor = new List<Vector2Int>();
+            foreach(int exit_idx in exit)
+            {
+                Vector2Int adjcell;
+                for(int i = -1; i <= 1; i++)
+                {
+                    for(int j = -1; j <= 1; j++)
+                    {
+                        if(i == 0 && j == 0)
+                            continue;
+                        adjcell = gui.exitPos[exit_idx] + new Vector2Int(i,j);
+                        if(fm.isValidCell(adjcell) && fm.isNotImmovableExitCell(adjcell) && !neighbor.Contains(adjcell))
+                            neighbor.Add(adjcell);
+                    }
+                }
+
+            }
+            return (float)CountMovable(neighbor) / neighbor.Count;
+            
+        }
+        return 0f;
+    }
+
+    int CountMovable(List<Vector2Int> neighbor)
+    {
+        FloorModel fm = FindObjectOfType<FloorModel>();
+        int count = 0;
+        foreach(Vector2Int cell in neighbor)
+        {
+            if(!fm.isEmptyCell(cell) && fm.floor[cell.x, cell.y].transform.GetChild(0).tag == "MovableObstacle")
+                count++;
+            if(!fm.isEmptyCell(cell) && fm.floor[cell.x, cell.y].transform.GetChild(0).tag == "AssignedObstacle")
+                count++;
+        }
+        return count;
+    }
+
+    void SolveConflictVolunteer(List<int> agents, float factor)
+    {
+        AgentManager am = FindObjectOfType<AgentManager>();
+        if (agents.Count == 0)
+        {
+            Debug.Log("Number of Potential Volunteers: 0");
+            return;
+        }
+        if (agents.Count == 1)
+        {
+            am.volunteerStrategy[0] = "D";
+            Debug.Log("Number of Potential Volunteers: 1");
+            return;
+        }
+
+        float cv = 1f; // Range(0f, 1f)
+        float p = 1f - Mathf.Pow(cv, 1f / (agents.Count - 1)) * factor;
+        int count = 0;
+        foreach (int agent_idx in agents)
+        {
+            am.volunteerStrategy[agent_idx] = Random.Range(0f, 1f) < p ? "D" : "C";
+            if (am.volunteerStrategy[agent_idx] == "D") count ++;
+        }
+        Debug.Log("Number of Potential Volunteers: " + count.ToString());
+    }
+
+    bool SetVolunteer()
+    {
+        AgentManager am = FindObjectOfType<AgentManager>();
+        bool flag = false;
+
+        for(int i = 0; i < obstacleList.Count; i++)
+        {
+            if(obstacleList[i].transform.tag != "MovableObstacle")
+            {
+                continue;
+            }
+            List<int> candidates = new List<int>();
+            foreach(int agent_idx in inRangeList[i])
+            {
+                if(Mathf.Abs(am.currentPos[agent_idx].x - currentPos[i].x) <= 1 &&
+                    Mathf.Abs(am.currentPos[agent_idx].y - currentPos[i].y) <= 1 && am.whiteList[agent_idx].Contains(i))
+                {
+                    candidates.Add(agent_idx);
+                }
+                    
+            }
+            if(candidates.Count > 0)
+            {
+                int volunteer_idx = candidates[Random.Range(0,candidates.Count)];
+                SetObstacleType(obstacleList[i],"AssignedObstacle");
+                // Debug.Log("obstacleList[" + i.ToString()  + "]");
+                // Debug.Log("candidates.Count" + candidates.Count.ToString());
+                am.SetAgentType(am.agentList[volunteer_idx],"Volunteer");
+
+                am.inChargeOfList[volunteer_idx] = i;
+                am.whiteList[volunteer_idx].Clear();
+                am.blackList[volunteer_idx].Clear();
+                // set destination
+                flag = true;
+                foreach(int agent_idx in inRangeList[i])
+                {
+                    if(am.whiteList[agent_idx].Contains(i))
+                        am.whiteList[agent_idx].Remove(i);
+                    if(am.blackList[agent_idx].Contains(i))
+                        am.blackList[agent_idx].Remove(i);
+                }
+                inRangeList[i].Clear();
+
+            }
+
+        }
+        return flag;
+
     }
 }

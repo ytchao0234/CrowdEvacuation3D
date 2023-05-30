@@ -35,16 +35,7 @@ public class FloorField : MonoBehaviour
         }
     }
 
-    public bool isValidCell(Vector2Int cell)
-    {
-        GUI gui = FindObjectOfType<GUI>();
-
-        bool flg = true;
-        flg &= cell.x >= 0 && cell.x < gui.planeRow;
-        flg &= cell.y >= 0 && cell.y < gui.planeCol;
-
-        return flg;
-    }
+    
 
     public void DrawHeatMap(float[,] src_ff)
     {

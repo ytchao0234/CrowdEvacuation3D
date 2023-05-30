@@ -56,6 +56,11 @@ public class DynamicFloorField : MonoBehaviour
                 tmp_dff[curCell.x, curCell.y] = (1f - gui.dff_decay) * dff[i,j];
                 continue;
             }
+            else if(!fm.isEmptyCell(curCell) && fm.floor[i,j].transform.GetChild(0).tag == "AssignedObstacle")
+            {
+                tmp_dff[curCell.x, curCell.y] = (1f - gui.dff_decay) * dff[i,j];
+                continue;
+            }
             Vector2Int adjCell = curCell;
 
             for (int ii = -1; ii <= 1; ii++)
@@ -65,7 +70,7 @@ public class DynamicFloorField : MonoBehaviour
 
                 adjCell = curCell + new Vector2Int(ii, jj);
 
-                if (ff.isValidCell(adjCell))
+                if (fm.isValidCell(adjCell))
                 {
                     tmp_dff[curCell.x, curCell.y] += dff[adjCell.x, adjCell.y];
                 }
