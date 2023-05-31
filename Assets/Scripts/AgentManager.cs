@@ -30,7 +30,8 @@ public class AgentManager : MonoBehaviour
             RemoveExitAgents();
             AgentMove();
             FindObjectOfType<DynamicFloorField>().UpdateDFF_Diffuse_and_Decay();
-            // FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<DynamicFloorField>().dff);
+            FindObjectOfType<AnticipationFloorField>().UpdateAFF();
+            FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<AnticipationFloorField>().aff);
         }
     }
 
@@ -254,6 +255,7 @@ public class AgentManager : MonoBehaviour
             {
                 Debug.Log("Rotate 2");
                 Vector2 rotate = Quaternion.AngleAxis(45f, Vector3.forward) * n;
+                targetPos = volunteerPos + Vector2Int.RoundToInt(rotate);
                 if (fm.isValidCell(targetPos) && fm.isEmptyCell(targetPos) && !fm.isExitCell(targetPos))
                     obstaclePos = targetPos;
             }
@@ -262,7 +264,6 @@ public class AgentManager : MonoBehaviour
         {
             bool toPull = (Random.value > 0.5f);
             List<Vector2Int> candidates = new List<Vector2Int>();
-            toPull = true;
             if (toPull)
             {
                 Debug.Log("Pull");
@@ -301,7 +302,7 @@ public class AgentManager : MonoBehaviour
 
     void RemoveExitAgents()
     {
-        for(int i=0;i<agentNumber;)
+        for(int i = 0; i < agentNumber;)
         {
             if(agentList[i].transform.tag == "ExitAgent")
             {
@@ -386,5 +387,13 @@ public class AgentManager : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    public Vector2Int GetDestination(int i)
+    {
+        if (agentList[i].transform.tag != "Volunteer")
+            return Vector2Int.zero;
+        else
+            return agentList[i].GetComponent<SpecificFloorField>().destination;
     }
 }

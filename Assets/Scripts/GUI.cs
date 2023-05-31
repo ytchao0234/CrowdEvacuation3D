@@ -19,6 +19,7 @@ public class GUI : MonoBehaviour
     public float sff_offset_lambda = 1.5f;
     public float dff_decay = 0.3f;
     public float dff_diffuse = 0.8f;
+    public int aff_radius = 4;
     public int Not_Assign = -1;
 
     // Start is called before the first frame update

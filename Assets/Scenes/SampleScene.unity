@@ -475,6 +475,23 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 180854251928205957, guid: 7a1175400384d6448af3fa7112d62abc, type: 3}
   m_PrefabInstance: {fileID: 102554943391337264}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &102554943391337266 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4377459558391245699, guid: 7a1175400384d6448af3fa7112d62abc, type: 3}
+  m_PrefabInstance: {fileID: 102554943391337264}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &102554943391337267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102554943391337266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3701fca9abca67344b1b1dfcdd77febe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1423194775338038572
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -756,6 +773,10 @@ PrefabInstance:
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: dff_decay
       value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: aff_radius
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: dff_diffuse

@@ -77,7 +77,7 @@ public class ObstacleModel : MonoBehaviour
             DestroyImmediate(obstacleList[i]);
             // Destroy(obstacleList[i], 0f);
         }
-        for(int i=0; i< wallList.Count;i++)
+        for(int i = 0; i < wallList.Count;i++)
         {
             DestroyImmediate(wallList[i]);
             // Destroy(wallList[i], 0f);
