@@ -7,9 +7,9 @@ using System.Linq;
 public class ObstacleModel : MonoBehaviour
 {
     public GameObject obstacle;
-    float obstacleSize;
-    List<GameObject> obstacleList;
-    List<Vector2Int> currentPos;
+    public float obstacleSize;
+    public List<GameObject> obstacleList;
+    public List<Vector2Int> currentPos;
     List<int> influenceRadiusList;
     List<List<int>> inRangeList;
     List<int> volunteerList;
@@ -64,6 +64,7 @@ public class ObstacleModel : MonoBehaviour
 
     public void Setup()
     {
+        Debug.Log("Setup ObModel");
         SetupInRange();
         SetWhiteBlackList();
         SetVolunteer();
@@ -150,7 +151,7 @@ public class ObstacleModel : MonoBehaviour
     }
 
 
-    void SetObstacleType(GameObject obj, string type)
+    public void SetObstacleType(GameObject obj, string type)
     {
         switch (type)
         {
@@ -194,7 +195,7 @@ public class ObstacleModel : MonoBehaviour
                     if (idx >= 0)
                     {
                         inRangeList[i].Add(idx);
-                        Debug.Log("inRangeList[" + i.ToString() + "]: " + idx.ToString());
+                        // Debug.Log("inRangeList[" + i.ToString() + "]: " + idx.ToString());
                     }
                 }
             }
@@ -211,7 +212,7 @@ public class ObstacleModel : MonoBehaviour
                 continue;
             }
             float tau = CalcBlockedProportion(i);
-            Debug.Log("tau: " + tau.ToString());
+            // Debug.Log("tau: " + tau.ToString());
             if(tau < 1f)
             {
                 float factor = Mathf.Pow(1f - tau, 1f / inRangeList[i].Count);
@@ -301,13 +302,13 @@ public class ObstacleModel : MonoBehaviour
         AgentManager am = FindObjectOfType<AgentManager>();
         if (agents.Count == 0)
         {
-            Debug.Log("Number of Potential Volunteers: 0");
+            // Debug.Log("Number of Potential Volunteers: 0");
             return;
         }
         if (agents.Count == 1)
         {
             am.volunteerStrategy[0] = "D";
-            Debug.Log("Number of Potential Volunteers: 1");
+            // Debug.Log("Number of Potential Volunteers: 1");
             return;
         }
 
@@ -319,7 +320,7 @@ public class ObstacleModel : MonoBehaviour
             am.volunteerStrategy[agent_idx] = Random.Range(0f, 1f) < p ? "D" : "C";
             if (am.volunteerStrategy[agent_idx] == "D") count ++;
         }
-        Debug.Log("Number of Potential Volunteers: " + count.ToString());
+        // Debug.Log("Number of Potential Volunteers: " + count.ToString());
     }
 
     bool SetVolunteer()
@@ -354,7 +355,7 @@ public class ObstacleModel : MonoBehaviour
                 am.inChargeOfList[volunteer_idx] = i;
                 am.whiteList[volunteer_idx].Clear();
                 am.blackList[volunteer_idx].Clear();
-                // set destination
+                SetDestination(volunteer_idx);
                 flag = true;
                 foreach(int agent_idx in inRangeList[i])
                 {
@@ -369,6 +370,16 @@ public class ObstacleModel : MonoBehaviour
 
         }
         return flag;
+    }
 
+    void SetDestination(int volunteer_idx)
+    {
+        AgentManager am = FindObjectOfType<AgentManager>();
+        SpecificFloorField specific_ff = am.agentList[volunteer_idx].GetComponent<SpecificFloorField>();
+        // TODO
+        Vector2Int dest = new Vector2Int(0, 0);
+        //
+        specific_ff.SetDestination(dest);
+        specific_ff.Setup();
     }
 }

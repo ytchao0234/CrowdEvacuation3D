@@ -30,7 +30,7 @@ public class AgentManager : MonoBehaviour
             RemoveExitAgents();
             AgentMove();
             FindObjectOfType<DynamicFloorField>().UpdateDFF_Diffuse_and_Decay();
-            FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<DynamicFloorField>().dff);
+            // FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<DynamicFloorField>().dff);
         }
     }
 
@@ -77,8 +77,6 @@ public class AgentManager : MonoBehaviour
                 k ++;
             }
         }
-
-
     }
 
     public void Reset()
@@ -100,24 +98,29 @@ public class AgentManager : MonoBehaviour
         inChargeOfList.Clear();
     }
 
+
     void AgentMove()
     {
         int[] random_agent = ShuffleRange_Int(0, agentNumber - 1);
 
         foreach (int i in random_agent)
         {
-            // if (agentList[i].transform.tag != "ActiveAgent") continue;
-            AgentMove_OneAgent(i);
+            if (agentList[i].transform.tag == "ActiveAgent")
+                AgentMove_Evacuee(i);
+            else if (agentList[i].transform.tag == "Volunteer")
+                AgentMove_Volunteer(i);
+
+            // if (agentList[i].transform.tag == "Volunteer")
+            //     AgentMove_Volunteer(i);
         }
 
         foreach (int i in random_agent)
         {
-            // if (agentList[i].transform.tag != "ActiveAgent") continue;
             StartCoroutine(AgentMove_Animation(i, 0f));
         }
     }
 
-    void AgentMove_OneAgent(int i)
+    void AgentMove_Evacuee(int i)
     {
         GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
@@ -144,11 +147,11 @@ public class AgentManager : MonoBehaviour
 
         possiblePos.Sort((a, b) => -a.Item2.CompareTo(b.Item2));
 
-        for (int m = possiblePos.Count - 1; m >= 0; m--)
+        for (int k = possiblePos.Count - 1; k >= 0; k--)
         {
-            if (possiblePos[m].Item2 >= possiblePos[0].Item2)
+            if (possiblePos[k].Item2 >= possiblePos[0].Item2)
             {
-                int rnd = Random.Range(0, m + 1);
+                int rnd = Random.Range(0, k + 1);
                 Vector2Int cell = possiblePos[rnd].Item1;
                 if (cell == currentPos[i]) return;
 
@@ -165,9 +168,139 @@ public class AgentManager : MonoBehaviour
         }
     }
 
+    void AgentMove_Volunteer(int i)
+    {
+        GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+        SpecificFloorField specific_ff = agentList[i].GetComponent<SpecificFloorField>();
+        ObstacleModel om = FindObjectOfType<ObstacleModel>();
+        Vector2Int obstaclePos = om.currentPos[inChargeOfList[i]];
+        Vector2Int volunteerPos = currentPos[i];
+
+        List<(Vector2Int, float)> possiblePos = new List<(Vector2Int, float)>();
+
+        for (int m = -1; m <= 1; m++)
+        for (int n = -1; n <= 1; n++)
+        {
+            Vector2Int cell = obstaclePos + new Vector2Int(m, n);
+            float ff_value = -1f * specific_ff.sff[cell.x, cell.y];
+
+            if (fm.isValidCell(cell) && fm.isEmptyCell(cell) && !fm.isExitCell(cell))
+            {
+                possiblePos.Add((cell, ff_value));
+            }
+        }
+
+        if (possiblePos.Count == 0) return;
+
+        possiblePos.Sort((a, b) => -a.Item2.CompareTo(b.Item2));
+
+        for (int k = possiblePos.Count - 1; k >= 0; k--)
+        {
+            if (possiblePos[k].Item2 >= possiblePos[0].Item2)
+            {
+                int rnd = Random.Range(0, k + 1);
+                Vector2Int cell = possiblePos[rnd].Item1;
+                if (cell == obstaclePos && possiblePos.Count > 1)
+                    cell = possiblePos[(rnd + 1) % possiblePos.Count].Item1;
+                else if (cell == obstaclePos)
+                    return;
+
+                GetPosition_MoveObstacle(ref volunteerPos, ref obstaclePos, cell);
+
+                lastPos[i] = currentPos[i];
+                currentPos[i] = volunteerPos;
+                agentList[i].transform.parent = fm.floor[currentPos[i].x, currentPos[i].y].transform;
+                om.currentPos[inChargeOfList[i]] = obstaclePos;
+                om.obstacleList[inChargeOfList[i]].transform.parent = fm.floor[obstaclePos.x, obstaclePos.y].transform;
+                // TODO: animation
+                float planeSize = fm.plane.transform.GetComponent<Renderer>().bounds.size.x;
+                om.obstacleList[inChargeOfList[i]].transform.localScale = Vector3.one * (planeSize / om.obstacleSize);
+                om.obstacleList[inChargeOfList[i]].transform.position = fm.floor[obstaclePos.x, obstaclePos.y].transform.position;
+                om.obstacleList[inChargeOfList[i]].transform.position += Vector3.up * planeSize / 2f;
+                //
+                if (obstaclePos == specific_ff.destination)
+                {
+                    om.SetObstacleType(om.obstacleList[inChargeOfList[i]], "ImmovableObstacle");
+                    SetAgentType(agentList[i], "ActiveAgent");
+                }
+                return;
+            }
+        }
+    }
+
+    void GetPosition_MoveObstacle(ref Vector2Int volunteerPos, ref Vector2Int obstaclePos, Vector2Int targetPos)
+    {
+        FloorModel fm = FindObjectOfType<FloorModel>();
+        Vector2 n = obstaclePos - volunteerPos;
+        Vector2 f = targetPos - obstaclePos;
+        if (Vector2Int.Distance(volunteerPos, targetPos) >= Vector2Int.Distance(obstaclePos, targetPos))
+        {
+            if (Vector2.Angle(n, f) <= 45)
+            {
+                Debug.Log("Push");
+                volunteerPos = obstaclePos;
+                obstaclePos = targetPos;
+            }
+            else if (n.x * f.y - n.y * f.x <= 0f)
+            {
+                Debug.Log("Rotate 1");
+                Vector2 rotate = Quaternion.AngleAxis(-45f, Vector3.forward) * n;
+                targetPos = volunteerPos + Vector2Int.RoundToInt(rotate);
+                if (fm.isValidCell(targetPos) && fm.isEmptyCell(targetPos) && !fm.isExitCell(targetPos))
+                    obstaclePos = targetPos;
+            }
+            else 
+            {
+                Debug.Log("Rotate 2");
+                Vector2 rotate = Quaternion.AngleAxis(45f, Vector3.forward) * n;
+                if (fm.isValidCell(targetPos) && fm.isEmptyCell(targetPos) && !fm.isExitCell(targetPos))
+                    obstaclePos = targetPos;
+            }
+        }
+        else
+        {
+            bool toPull = (Random.value > 0.5f);
+            List<Vector2Int> candidates = new List<Vector2Int>();
+            toPull = true;
+            if (toPull)
+            {
+                Debug.Log("Pull");
+                Vector2Int[] toAdd = {
+                    volunteerPos - Vector2Int.RoundToInt(n),
+                    volunteerPos - Vector2Int.RoundToInt(Quaternion.AngleAxis(-45f, Vector3.forward) * n),
+                    volunteerPos - Vector2Int.RoundToInt(Quaternion.AngleAxis( 45f, Vector3.forward) * n)
+                };
+                foreach (Vector2Int candidate in toAdd)
+                {
+                    if (fm.isValidCell(candidate) && fm.isEmptyCell(candidate) && !fm.isExitCell(candidate))
+                        candidates.Add(candidate);
+                }
+            }
+            else
+            {
+                Debug.Log("Change");
+                for (int i = -1; i <= 1; i++)
+                for (int j = -1; j <= 1; j++)
+                {
+                    Vector2Int cell = obstaclePos + new Vector2Int(i, j);
+                    if (cell == obstaclePos) continue;
+                    if (fm.isValidCell(cell) && fm.isEmptyCell(cell) && !fm.isExitCell(cell))
+                        if (Mathf.Abs(cell.x - volunteerPos.x) <= 1 &&
+                            Mathf.Abs(cell.y - volunteerPos.y) <= 1)
+                            candidates.Add(cell);
+                }
+            }
+            if (candidates.Count > 0)
+            {
+                obstaclePos = volunteerPos;
+                volunteerPos = candidates[Random.Range(0, candidates.Count)];
+            }
+        }
+    }
+
     void RemoveExitAgents()
     {
-
         for(int i=0;i<agentNumber;)
         {
             if(agentList[i].transform.tag == "ExitAgent")
@@ -176,10 +309,13 @@ public class AgentManager : MonoBehaviour
                 agentList.RemoveAt(i);
                 lastPos.RemoveAt(i);
                 currentPos.RemoveAt(i);
+                volunteerStrategy.RemoveAt(i);
+                whiteList.RemoveAt(i);
+                blackList.RemoveAt(i);
+                inChargeOfList.RemoveAt(i);
                 agentNumber--;
             }
-            else
-                i++;
+            else i++;
         }
     }
 

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028359, g: 0.22571385, b: 0.30692258, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -755,7 +755,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: dff_decay
-      value: 0.8
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: dff_diffuse
@@ -767,7 +767,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: exitPos.Array.size
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: test.rows.Array.size

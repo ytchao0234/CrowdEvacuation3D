@@ -35,8 +35,6 @@ public class FloorField : MonoBehaviour
         }
     }
 
-    
-
     public void DrawHeatMap(float[,] src_ff)
     {
         GUI gui = FindObjectOfType<GUI>();

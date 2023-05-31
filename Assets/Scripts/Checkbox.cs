@@ -63,7 +63,7 @@ public class Checkbox : MonoBehaviour
 
     void CheckboxOnClick()
     {
-        Debug.Log(i.ToString() + ", " + j.ToString());
+        // Debug.Log(i.ToString() + ", " + j.ToString());
         if (type != "Valid") return;
 
         select = (select + 1) % selectNumber;
@@ -94,7 +94,7 @@ public class Checkbox : MonoBehaviour
     {
         GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
-        Debug.Log(i.ToString() + ", " + j.ToString());
+        // Debug.Log(i.ToString() + ", " + j.ToString());
         Vector2Int temp = new Vector2Int(i,j);
         if (type == "Valid") return;
 

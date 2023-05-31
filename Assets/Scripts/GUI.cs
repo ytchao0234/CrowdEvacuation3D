@@ -6,15 +6,11 @@ using System.Linq;
 
 public class GUI : MonoBehaviour
 {
-    public int planeRow = 30;
-    public int planeCol = 30;
+    public int planeRow = 10;
+    public int planeCol = 10;
     public float agentDensity = 0.2f;
     public Vector2Int[] exitPos;
     public List<List<int>> exit_group = new List<List<int>>();
-    // public List<ExitParameter> exit_param_top;
-    // public List<ExitParameter> exit_param_bottom;
-    // public List<ExitParameter> exit_param_left;
-    // public List<ExitParameter> exit_param_right;
     public int[] exitWidth;
     public int totalExitWidth = 0;
     public float kS = 0.0f, kE = 1.0f, kD = 0.0f;
@@ -28,8 +24,7 @@ public class GUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // exitPos = GenExit();
-        // SetupExitWidth();
+
     }
 
     // Update is called once per frame
@@ -51,13 +46,12 @@ public class GUI : MonoBehaviour
 
     public void Reset()
     {
-       FindObjectOfType<ObstacleModel>().Reset();
        FindObjectOfType<AgentManager>().Reset();
+       FindObjectOfType<ObstacleModel>().Reset();
        FindObjectOfType<FloorModel>().Reset();
        FindObjectOfType<DynamicFloorField>().Reset();
        FindObjectOfType<StaticFloorField>().Reset();
        FindObjectOfType<StaticFloorField_ExitWidth>().Reset();
-       
     }
 
     void SetupExitWidth()
@@ -115,103 +109,7 @@ public class GUI : MonoBehaviour
 
         
         exit_group = dict.Values.ToList();
-        // foreach(var id in dict.ToList())
-        // {
-        //     Debug.Log(id.Key.ToString());
-        //     foreach(int value in id.Value)
-        //         Debug.Log(value.ToString());
-
-        // }
     }
-/*
-    Vector2Int[] GenExit()
-    {
-        List<Vector2Int> exitResult = new List<Vector2Int>();
-        Vector2Int temp;
-        foreach (ExitParameter param in exit_param_top)
-        {
-            temp = GenExit_One(param,"Top");
-            int start = temp.x;
-            int end = temp.y;
-            for(int i = start; i <= end; i++)
-            {
-                exitResult.Add(new Vector2Int(0,i));
-            }
-        }
-        foreach (ExitParameter param in exit_param_bottom)
-        {
-            temp = GenExit_One(param,"Bottom");
-            int start = temp.x;
-            int end = temp.y;
-            for(int i = start; i <= end; i++)
-            {
-                exitResult.Add(new Vector2Int(planeRow - 1,i));
-            }
-        }
-        foreach (ExitParameter param in exit_param_left)
-        {
-            temp = GenExit_One(param,"Left");
-            int start = temp.x;
-            int end = temp.y;
-            for(int i = start; i <= end; i++)
-            {
-                exitResult.Add(new Vector2Int(i,0));
-            }
-        }
-        foreach (ExitParameter param in exit_param_right)
-        {
-            temp = GenExit_One(param,"Right");
-            int start = temp.x;
-            int end = temp.y;
-            for(int i = start; i <= end; i++)
-            {
-                exitResult.Add(new Vector2Int(i,planeCol - 1));
-            }
-        }
-        return exitResult.Distinct().ToArray();
-    }
-    
-    Vector2Int GenExit_One(ExitParameter param,string Bound)
-    {
-
-        int center = 0;
-        int width = 0;
-        int start = 0;
-        int end = 0;
-        int maxWidth = 0;
-        if(String.Equals(Bound,"Top") || String.Equals(Bound,"Bottom"))
-            maxWidth = planeCol;
-        else
-            maxWidth = planeRow;
-
-        center = Mathf.FloorToInt(param.position * maxWidth);
-        width = Mathf.FloorToInt(param.width * maxWidth);
-
-        if (width >= maxWidth)
-        {
-            start = 0;
-            end = maxWidth - 1;
-        }
-        else
-        {
-            start = center - (width / 2);
-            end = center + (width / 2);
-
-            if (start < 0)
-            {
-                start = 0;
-                end = start + width;
-            }
-            else if (end >= maxWidth)
-            {
-                end = maxWidth - 1;
-                start = end - width;
-            }
-        }
-
-        return new Vector2Int(start,end);
-        
-    }*/
 }
 
 
