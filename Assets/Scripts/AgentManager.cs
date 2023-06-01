@@ -22,6 +22,7 @@ public class AgentManager : MonoBehaviour
     void Start()
     {
         Setup();
+        
     }
 
     // Update is called once per frame
@@ -166,7 +167,11 @@ public class AgentManager : MonoBehaviour
             }
         }
 
-        if (possiblePos.Count == 0) return;
+        if (possiblePos.Count == 0)
+        {
+            lastPos[i] = currentPos[i];
+            return;
+        }
 
         possiblePos.Sort((a, b) => -a.Item2.CompareTo(b.Item2));
 
@@ -176,7 +181,13 @@ public class AgentManager : MonoBehaviour
             {
                 int rnd = Random.Range(0, k + 1);
                 Vector2Int cell = possiblePos[rnd].Item1;
-                if (cell == currentPos[i]) return;
+                if (cell == currentPos[i]) 
+                {
+                    lastPos[i] = currentPos[i];
+                    // Debug.Log("lastPos: " + lastPos[i].ToString());
+                    // Debug.Log("currentPos: " + currentPos[i].ToString());
+                    return;
+                }
 
                 dff.dff[currentPos[i].x,currentPos[i].y] += 1f;
                 lastPos[i] = currentPos[i];
@@ -206,8 +217,8 @@ public class AgentManager : MonoBehaviour
 
         if(om.LowTauDensity(inChargeOfList[i]))
         {
-            Debug.Log("obstaclePos: " + obstaclePos.ToString());
-            Debug.Log("density: " + om.densityList[inChargeOfList[i]].ToString());
+            // Debug.Log("obstaclePos: " + obstaclePos.ToString());
+            // Debug.Log("density: " + om.densityList[inChargeOfList[i]].ToString());
             om.SetObstacleType(om.obstacleList[inChargeOfList[i]],"MovableObstacle");
             SetAgentType(agentList[i],"ActiveAgent");
             AgentMove_Evacuee(i);
@@ -219,6 +230,7 @@ public class AgentManager : MonoBehaviour
         for (int m = -1; m <= 1; m++)
         for (int n = -1; n <= 1; n++)
         {
+
             Vector2Int cell = obstaclePos + new Vector2Int(m, n);
             
 
@@ -229,7 +241,12 @@ public class AgentManager : MonoBehaviour
             }
         }
 
-        if (possiblePos.Count == 0) return;
+        if (possiblePos.Count == 0)
+        {
+            lastPos[i] = currentPos[i];
+            return;
+        }
+         
 
         possiblePos.Sort((a, b) => -a.Item2.CompareTo(b.Item2));
 
@@ -242,7 +259,13 @@ public class AgentManager : MonoBehaviour
                 if (cell == obstaclePos && possiblePos.Count > 1)
                     cell = possiblePos[(rnd + 1) % possiblePos.Count].Item1;
                 else if (cell == obstaclePos)
+                {
+                    lastPos[i] = currentPos[i];
+                    // Debug.Log("lastPos: " + lastPos[i].ToString());
+                    // Debug.Log("currentPos: " + currentPos[i].ToString());
                     return;
+                }
+                    
 
                 GetPosition_MoveObstacle(ref volunteerPos, ref obstaclePos, cell);
                 if(obstaclePos != om.currentPos[inChargeOfList[i]])
@@ -410,16 +433,10 @@ public class AgentManager : MonoBehaviour
 
         // animation.SetValue("Walk", false);
         // animation.SetValue("MoveObs", false);
-        if (lastCell != curCell && agentList[i].transform.tag == "ActiveAgent")
+        if (lastCell != curCell && agentList[i].transform.tag == "ActiveAgent" || agentList[i].transform.tag == "ExitAgent")
             anima.SetBool("Walk", true);
         else if ((lastCell != curCell || lastRotation != currentRotation) && agentList[i].transform.tag == "Volunteer")
             anima.SetBool("MoveObs", true);
-        if(i == 0)
-        {
-            Debug.Log("Walk: " + anima.GetBool("Walk").ToString());
-            Debug.Log("MoveObs: " + anima.GetBool("MoveObs").ToString());
-        }
-        
         
         while (timer < duration)
         {

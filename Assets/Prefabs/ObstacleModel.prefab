@@ -45,3 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstacle: {fileID: 523459669970978625, guid: ef447603545d7574db6fba4207e92494, type: 3}
+  obstacleSize: 0
+  obstacleList: []
+  currentPos: []
+  densityList: []

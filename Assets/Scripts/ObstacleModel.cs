@@ -375,7 +375,7 @@ public class ObstacleModel : MonoBehaviour
                 am.inChargeOfList[volunteer_idx] = i;
                 am.whiteList[volunteer_idx].Clear();
                 am.blackList[volunteer_idx].Clear();
-                Debug.Log("Obstacle: " + currentPos[i].ToString());
+                // Debug.Log("Obstacle: " + currentPos[i].ToString());
                 SetDestination(volunteer_idx, i);
                 flag = true;
                 foreach(int agent_idx in inRangeList[i])
@@ -454,7 +454,7 @@ public class ObstacleModel : MonoBehaviour
                         dest = possiblePos[(rnd + 1) % possiblePos.Count].Item1;
                     }
                 }
-                Debug.Log("Dest: " + dest.ToString());
+                // Debug.Log("Dest: " + dest.ToString());
                 break;
             }
         }
