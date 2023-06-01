@@ -29,6 +29,7 @@ public class SpecificFloorField : MonoBehaviour
     {
         Reset();
         GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
 
         sff[destination.x, destination.y] = 0f;
         SetSFF();
@@ -40,6 +41,8 @@ public class SpecificFloorField : MonoBehaviour
         for(int i = 0; i < gui.planeRow; i++)
         for(int j = 0; j < gui.planeCol; j++)
         {
+            if(fm.isObstacleCell(new Vector2Int(i,j)))
+                sff[i,j] = max_value;
             if(sff[i,j] >= gui.sff_init_value)
                 sff[i,j] = max_value;
         }
@@ -79,7 +82,7 @@ public class SpecificFloorField : MonoBehaviour
                 if (i == 0 && j == 0) continue;
                 adjCell = curCell + new Vector2Int(i, j);
 
-                if (fm.isValidCell(adjCell) && !fm.isObstacleCell(adjCell))
+                if (fm.isValidCell(adjCell))
                 {
                     float offset = (i == 0 || j == 0) ? offset_hv : offset_d;
                     if (sff[adjCell.x, adjCell.y] > sff[curCell.x, curCell.y] + offset)

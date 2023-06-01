@@ -24,14 +24,21 @@ public class AgentManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        GUI gui = FindObjectOfType<GUI>();
         if (Input.GetKeyDown(KeyCode.Space))
         {
             FindObjectOfType<FloorField>().Compute();
+            FindObjectOfType<AnticipationFloorField>().UpdateAFF();
             RemoveExitAgents();
             AgentMove();
             FindObjectOfType<DynamicFloorField>().UpdateDFF_Diffuse_and_Decay();
-            FindObjectOfType<AnticipationFloorField>().UpdateAFF();
-            FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<AnticipationFloorField>().aff);
+            if(gui.flg_update_sff)
+            {
+                FindObjectOfType<StaticFloorField>().Setup();
+                FindObjectOfType<StaticFloorField_ExitWidth>().Setup();
+            }
+            // FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<FloorField>().ff);
+            FindObjectOfType<ObstacleModel>().Setup();
         }
     }
 
@@ -102,14 +109,18 @@ public class AgentManager : MonoBehaviour
 
     void AgentMove()
     {
+        GUI gui = FindObjectOfType<GUI>();
         int[] random_agent = ShuffleRange_Int(0, agentNumber - 1);
+        gui.flg_update_sff = false;
 
         foreach (int i in random_agent)
         {
             if (agentList[i].transform.tag == "ActiveAgent")
                 AgentMove_Evacuee(i);
             else if (agentList[i].transform.tag == "Volunteer")
+            {
                 AgentMove_Volunteer(i);
+            }
 
             // if (agentList[i].transform.tag == "Volunteer")
             //     AgentMove_Volunteer(i);
@@ -134,13 +145,13 @@ public class AgentManager : MonoBehaviour
         for (int n = -1; n <= 1; n++)
         {
             Vector2Int cell = currentPos[i] + new Vector2Int(m, n);
-            float ff_value = ff.ff[cell.x, cell.y];
 
             if (fm.isValidCell(cell) && fm.isEmptyCell(cell))
             {
+                float ff_value = ff.ff[cell.x, cell.y];
                 if (lastPos[i] == cell)
                     ff_value = ff_value - gui.kD;
-                possiblePos.Add((cell, ff_value));
+                possiblePos.Add((cell, Mathf.Exp(ff_value)));
             }
         }
 
@@ -178,16 +189,27 @@ public class AgentManager : MonoBehaviour
         Vector2Int obstaclePos = om.currentPos[inChargeOfList[i]];
         Vector2Int volunteerPos = currentPos[i];
 
+        if(om.LowTauDensity(inChargeOfList[i]))
+        {
+            Debug.Log("obstaclePos: " + obstaclePos.ToString());
+            Debug.Log("density: " + om.densityList[inChargeOfList[i]].ToString());
+            om.SetObstacleType(om.obstacleList[inChargeOfList[i]],"MovableObstacle");
+            SetAgentType(agentList[i],"ActiveAgent");
+            AgentMove_Evacuee(i);
+            return;
+        }
+
         List<(Vector2Int, float)> possiblePos = new List<(Vector2Int, float)>();
 
         for (int m = -1; m <= 1; m++)
         for (int n = -1; n <= 1; n++)
         {
             Vector2Int cell = obstaclePos + new Vector2Int(m, n);
-            float ff_value = -1f * specific_ff.sff[cell.x, cell.y];
+            
 
             if (fm.isValidCell(cell) && fm.isEmptyCell(cell) && !fm.isExitCell(cell))
             {
+                float ff_value = -1f * specific_ff.sff[cell.x, cell.y];
                 possiblePos.Add((cell, ff_value));
             }
         }
@@ -208,23 +230,28 @@ public class AgentManager : MonoBehaviour
                     return;
 
                 GetPosition_MoveObstacle(ref volunteerPos, ref obstaclePos, cell);
+                if(obstaclePos != om.currentPos[inChargeOfList[i]])
+                    gui.flg_update_sff = true;
 
                 lastPos[i] = currentPos[i];
                 currentPos[i] = volunteerPos;
                 agentList[i].transform.parent = fm.floor[currentPos[i].x, currentPos[i].y].transform;
-                om.currentPos[inChargeOfList[i]] = obstaclePos;
+                // om.currentPos[inChargeOfList[i]] = obstaclePos;
                 om.obstacleList[inChargeOfList[i]].transform.parent = fm.floor[obstaclePos.x, obstaclePos.y].transform;
                 // TODO: animation
-                float planeSize = fm.plane.transform.GetComponent<Renderer>().bounds.size.x;
-                om.obstacleList[inChargeOfList[i]].transform.localScale = Vector3.one * (planeSize / om.obstacleSize);
-                om.obstacleList[inChargeOfList[i]].transform.position = fm.floor[obstaclePos.x, obstaclePos.y].transform.position;
-                om.obstacleList[inChargeOfList[i]].transform.position += Vector3.up * planeSize / 2f;
+                // float planeSize = fm.plane.transform.GetComponent<Renderer>().bounds.size.x;
+                // om.obstacleList[inChargeOfList[i]].transform.localScale = Vector3.one * (planeSize / om.obstacleSize);
+                // om.obstacleList[inChargeOfList[i]].transform.position = fm.floor[obstaclePos.x, obstaclePos.y].transform.position;
+                // om.obstacleList[inChargeOfList[i]].transform.position += Vector3.up * planeSize / 2f;
+                StartCoroutine(om.ObstacleMove_Animation(inChargeOfList[i], obstaclePos, 0f));
                 //
                 if (obstaclePos == specific_ff.destination)
                 {
                     om.SetObstacleType(om.obstacleList[inChargeOfList[i]], "ImmovableObstacle");
                     SetAgentType(agentList[i], "ActiveAgent");
                 }
+                if (gui.flg_update_sff)
+                    specific_ff.Setup();
                 return;
             }
         }

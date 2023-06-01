@@ -13,7 +13,7 @@ public class GUI : MonoBehaviour
     public List<List<int>> exit_group = new List<List<int>>();
     public int[] exitWidth;
     public int totalExitWidth = 0;
-    public float kS = 0.0f, kE = 1.0f, kD = 0.0f;
+    public float kS = 0.0f, kE = 1.0f, kD = 0.0f, kA = 0.0f;
     public float sff_init_value = 1000f;
     public float sff_offset_hv = 1.0f;
     public float sff_offset_lambda = 1.5f;
@@ -21,6 +21,9 @@ public class GUI : MonoBehaviour
     public float dff_diffuse = 0.8f;
     public int aff_radius = 4;
     public int Not_Assign = -1;
+    public float low_density = 0.5f;
+    public int min_distance_from_exits = 2;
+    public bool flg_update_sff = false;
 
     // Start is called before the first frame update
     void Start()

@@ -26,12 +26,13 @@ public class FloorField : MonoBehaviour
         StaticFloorField sff = FindObjectOfType<StaticFloorField>();
         StaticFloorField_ExitWidth sff_e = FindObjectOfType<StaticFloorField_ExitWidth>();
         DynamicFloorField dff = FindObjectOfType<DynamicFloorField>();
+        AnticipationFloorField aff = FindObjectOfType<AnticipationFloorField>();
         FloorModel fm = FindObjectOfType<FloorModel>();
 
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
-            ff[i,j] = -gui.kS * sff.sff[i,j] - gui.kE * sff_e.sff_e[i,j] + gui.kD * dff.dff[i,j];
+            ff[i,j] = -gui.kS * sff.sff[i,j] - gui.kE * sff_e.sff_e[i,j] + gui.kD * dff.dff[i,j] - gui.kA * aff.aff[i,j];
         }
     }
 
@@ -40,8 +41,8 @@ public class FloorField : MonoBehaviour
         GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
 
-        float min = src_ff.Cast<float>().Min();
-        float max = src_ff.Cast<float>().Max();
+        float min = Mathf.Log(src_ff.Cast<float>().Min(),2);
+        float max = Mathf.Log(src_ff.Cast<float>().Max(),2);
         float range = max - min;
 
         Gradient gradient = new Gradient();
@@ -77,7 +78,7 @@ public class FloorField : MonoBehaviour
             if(range == 0.0f)
                 value = 0.0f;
             else
-                value = ((src_ff[i,j] - min) / range);
+                value = ((Mathf.Log(src_ff[i,j],2) - min) / range);
             fm.floor[i,j].GetComponent<Renderer>().material.color = gradient.Evaluate(value);
         }
     }

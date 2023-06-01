@@ -23,6 +23,8 @@ public class StaticFloorField : MonoBehaviour
     {
         Reset();
         GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+        
         Vector2Int[] exitPos = gui.exitPos;
         for (int i = 0; i < exitPos.Length; i++)
         {
@@ -37,6 +39,8 @@ public class StaticFloorField : MonoBehaviour
         for(int i=0;i<gui.planeRow;i++)
         for(int j=0;j<gui.planeCol;j++)
         {
+            if(fm.isObstacleCell(new Vector2Int(i,j)))
+                sff[i,j] = max_value;
             if(sff[i,j] >= gui.sff_init_value)
                 sff[i,j] = max_value;
         }
@@ -78,7 +82,7 @@ public class StaticFloorField : MonoBehaviour
 
                 adjCell = curCell + new Vector2Int(i, j);
 
-                if (fm.isValidCell(adjCell) && !fm.isObstacleCell(adjCell))
+                if (fm.isValidCell(adjCell))
                 {
                     float offset = (i == 0 || j == 0) ? offset_hv : offset_d;
 

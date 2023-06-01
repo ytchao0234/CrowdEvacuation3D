@@ -96,6 +96,15 @@ public class FloorModel : MonoBehaviour
         return flg;
     }
 
+    public bool isImmovableObstacle(Vector2Int cell)
+    {
+        bool flg = isEmptyCell(cell);
+        if (flg) return !flg;
+        flg = floor[cell.x, cell.y].transform.GetChild(0).tag == "ImmovableObstacle";
+
+        return flg;
+    }
+    
     public bool isNotImmovableExitCell(Vector2Int cell)
     {
         bool flg;

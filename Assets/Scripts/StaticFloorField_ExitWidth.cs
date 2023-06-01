@@ -23,6 +23,7 @@ public class StaticFloorField_ExitWidth : MonoBehaviour
     public void Setup()
     {
         GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
         Vector2Int[] exitPos = gui.exitPos;
         int[] exitWidth = gui.exitWidth;
         Reset();
@@ -39,6 +40,8 @@ public class StaticFloorField_ExitWidth : MonoBehaviour
         for(int i=0;i<gui.planeRow;i++)
         for(int j=0;j<gui.planeCol;j++)
         {
+            if (fm.isObstacleCell(new Vector2Int(i, j)))
+                sff_e[i,j] = max_value;
             if(sff_e[i,j] >= gui.sff_init_value)
                 sff_e[i,j] = max_value;
         }
@@ -54,7 +57,6 @@ public class StaticFloorField_ExitWidth : MonoBehaviour
         {
             sff_e[i, j] = gui.sff_init_value;
         }
-
     }
 
     void SetSFFE_OneExit(Vector2Int exitPos, int exitWidth)
@@ -63,8 +65,12 @@ public class StaticFloorField_ExitWidth : MonoBehaviour
         FloorField ff = FindObjectOfType<FloorField>();
         FloorModel fm = FindObjectOfType<FloorModel>();
 
+        
         float offset_hv = Mathf.Exp(-1.0f * exitWidth / gui.totalExitWidth);
         float offset_d = offset_hv * gui.sff_offset_lambda;
+        // Debug.Log("totalExitWidth:" + gui.totalExitWidth.ToString());
+        // Debug.Log("offset_hv:" + offset_hv.ToString());
+        // Debug.Log("offset_d:" + offset_d.ToString());
 
         Queue<Vector2Int> toDoList = new Queue<Vector2Int>();
         toDoList.Enqueue(exitPos);
@@ -73,7 +79,7 @@ public class StaticFloorField_ExitWidth : MonoBehaviour
         {
             Vector2Int curCell = toDoList.Dequeue();
             Vector2Int adjCell = curCell;
-
+            // Debug.Log("curCell:" + curCell.ToString());
             for (int i = -1; i <= 1; i++)
 			for (int j = -1; j <= 1; j++)
             {
@@ -81,7 +87,7 @@ public class StaticFloorField_ExitWidth : MonoBehaviour
 
                 adjCell = curCell + new Vector2Int(i, j);
 
-                if (fm.isValidCell(adjCell) && !fm.isObstacleCell(adjCell))
+                if (fm.isValidCell(adjCell))
                 {
                     float offset = (i == 0 || j == 0) ? offset_hv : offset_d;
 

@@ -14,6 +14,8 @@ public class ObstacleModel : MonoBehaviour
     List<List<int>> inRangeList;
     List<int> volunteerList;
     List<GameObject> wallList;
+    public List<float> densityList;
+    List<float> tauList;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +29,8 @@ public class ObstacleModel : MonoBehaviour
         influenceRadiusList = new List<int>();
         inRangeList = new List<List<int>>();
         volunteerList = new List<int>();
+        densityList = new List<float>();
+        tauList = new List<float>();                                          
         obstacleSize = obstacle.transform.GetComponent<Renderer>().bounds.size.x;
         float planeSize = fm.plane.transform.GetComponent<Renderer>().bounds.size.x;
         List<Vector2Int> boundPos = new List<Vector2Int>();
@@ -88,6 +92,8 @@ public class ObstacleModel : MonoBehaviour
         volunteerList.Clear();
         influenceRadiusList.Clear();
         wallList.Clear();
+        densityList.Clear();
+        tauList.Clear();
     }
 
     void GenObstacle(int i, int j, string type)
@@ -178,15 +184,24 @@ public class ObstacleModel : MonoBehaviour
         FloorModel fm = FindObjectOfType<FloorModel>();
         AgentManager am = FindObjectOfType<AgentManager>();
 
+        densityList.Clear();
         for (int i = 0; i < obstacleList.Count; i++)
         {
-            if (obstacleList[i].transform.tag != "MovableObstacle")
+            inRangeList[i].Clear();
+            densityList.Add(0f);
+            if (obstacleList[i].transform.tag != "MovableObstacle" && obstacleList[i].transform.tag != "AssignedObstacle")
                 continue;
 
             int r = influenceRadiusList[i];
+            int floorCount = 0;
+            int agentCount = 0;
+
             for (int j = -r; j <=r ; j++)
             for (int k = -r; k <=r ; k++)
             {
+                if(((j*j + k*k) > (r*r)) || (j == 0 && k == 0))
+                    continue;
+                floorCount++;
                 Vector2Int cell = currentPos[i] + new Vector2Int(j, k);
 
                 if (fm.isValidCell(cell) && fm.isAgentCell(cell))
@@ -197,25 +212,30 @@ public class ObstacleModel : MonoBehaviour
                         inRangeList[i].Add(idx);
                         // Debug.Log("inRangeList[" + i.ToString() + "]: " + idx.ToString());
                     }
+                    agentCount++;
                 }
             }
+            if(floorCount != 0)
+                densityList[i] = (float)agentCount/floorCount;
         }
     }
 
     void SetWhiteBlackList()
     {
         AgentManager am = FindObjectOfType<AgentManager>();
+        tauList.Clear();
         for(int i = 0; i < obstacleList.Count; i++)
         {
+            tauList.Add(0f);
             if(obstacleList[i].transform.tag != "MovableObstacle")
             {
                 continue;
             }
-            float tau = CalcBlockedProportion(i);
+            tauList[i] = CalcBlockedProportion(i);
             // Debug.Log("tau: " + tau.ToString());
-            if(tau < 1f)
+            if(tauList[i] < 1f)
             {
-                float factor = Mathf.Pow(1f - tau, 1f / inRangeList[i].Count);
+                float factor = Mathf.Pow(1f - tauList[i], 1f / inRangeList[i].Count);
                 SolveConflictVolunteer(inRangeList[i], factor);
                 foreach(int agent_idx in inRangeList[i])
                 {
@@ -355,7 +375,8 @@ public class ObstacleModel : MonoBehaviour
                 am.inChargeOfList[volunteer_idx] = i;
                 am.whiteList[volunteer_idx].Clear();
                 am.blackList[volunteer_idx].Clear();
-                SetDestination(volunteer_idx);
+                Debug.Log("Obstacle: " + currentPos[i].ToString());
+                SetDestination(volunteer_idx, i);
                 flag = true;
                 foreach(int agent_idx in inRangeList[i])
                 {
@@ -372,14 +393,103 @@ public class ObstacleModel : MonoBehaviour
         return flag;
     }
 
-    void SetDestination(int volunteer_idx)
+    void SetDestination(int volunteer_idx, int obstacle_idx)
     {
         AgentManager am = FindObjectOfType<AgentManager>();
         SpecificFloorField specific_ff = am.agentList[volunteer_idx].GetComponent<SpecificFloorField>();
+        GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+        StaticFloorField sff = FindObjectOfType<StaticFloorField>();
+        StaticFloorField_ExitWidth sff_e = FindObjectOfType<StaticFloorField_ExitWidth>();
+
         // TODO
-        Vector2Int dest = new Vector2Int(0, 0);
+        Vector2Int dest = currentPos[obstacle_idx];
+        specific_ff.SetDestination(dest);
+        specific_ff.Setup();
+        List<(Vector2Int,float)> possiblePos = new List<(Vector2Int,float)>();
+        for(int i = 0;i < gui.planeRow; i++)
+        {
+            for(int j = 0; j < gui.planeCol;j++)
+            {
+                Vector2Int cell = new Vector2Int(i,j);
+                float sff_value = gui.kS * sff.sff[i,j] + gui.kE * sff_e.sff_e[i,j];
+                if(!(fm.isEmptyCell(cell) || fm.isAgentCell(cell)) || 
+                    sff_value < gui.min_distance_from_exits || cell == am.currentPos[volunteer_idx])
+                    continue;
+                    
+                int numWallNeighbors = 0;
+                Vector2Int adjCell = cell;
+                
+                for(int ii = -1; ii <= 1; ii++)
+                {
+                    for(int jj = -1; jj <=1; jj++)
+                    {
+                        if(ii == 0 && jj == 0)
+                            continue;
+                        adjCell = cell + new Vector2Int(ii,jj);
+                        if(fm.isValidCell(adjCell) && fm.isImmovableObstacle(adjCell))
+                            numWallNeighbors++;
+                    }
+                }
+
+                if(numWallNeighbors >= 3)
+                    possiblePos.Add((cell, specific_ff.sff[cell.x, cell.y]));
+            }
+        }
+        if (possiblePos.Count == 0) return;
+
+        possiblePos.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+
+        for (int k = possiblePos.Count - 1; k >= 0; k--)
+        {
+            if (possiblePos[k].Item2 <= possiblePos[0].Item2)
+            {
+                int rnd = Random.Range(0, k + 1);
+                int count = 0;
+                dest = possiblePos[rnd].Item1;
+                if (possiblePos.Count > 1)
+                {
+                    while (am.agentList.FindIndex(agent => agent.GetComponent<SpecificFloorField>().destination == dest) != -1 && count ++ < possiblePos.Count)
+                    {
+                        dest = possiblePos[(rnd + 1) % possiblePos.Count].Item1;
+                    }
+                }
+                Debug.Log("Dest: " + dest.ToString());
+                break;
+            }
+        }
+
+        
         //
         specific_ff.SetDestination(dest);
         specific_ff.Setup();
+    }
+
+    public bool LowTauDensity(int obstacle_idx)
+    {
+        GUI gui = FindObjectOfType<GUI>();
+        return (densityList[obstacle_idx] < gui.low_density && tauList[obstacle_idx] < 1f);
+    }
+
+    public IEnumerator ObstacleMove_Animation(int i, Vector2Int dest, float delay = 0f)
+    {
+        yield return new WaitForSeconds(delay);
+
+        FloorModel fm = FindObjectOfType<FloorModel>();
+
+        float timer = 0.0f;
+        float duration = 0.8f;
+        Vector3 from = fm.floor[currentPos[i].x, currentPos[i].y].transform.position;
+        Vector3 to = fm.floor[dest.x, dest.y].transform.position;
+        currentPos[i] = dest;
+
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            obstacleList[i].transform.position = Vector3.Lerp(from, to, timer/duration);
+            yield return null;
+        }
+
+        yield break;
     }
 }
