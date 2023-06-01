@@ -14,6 +14,8 @@ public class FloorModel : MonoBehaviour
         int planeRow = gui.planeRow;
         int planeCol = gui.planeCol;
         float planeSize = plane.transform.GetComponent<Renderer>().bounds.size.x;
+        Vector3 pos;
+        GameObject obj;
 
         floor = new GameObject[planeRow, planeCol];
 
@@ -21,14 +23,22 @@ public class FloorModel : MonoBehaviour
         {
             for (int j = 0; j < planeCol; j ++)
             {
-                Vector3 pos = transform.position + (Vector3.back * (i - planeRow / 2) + Vector3.right * (j - planeCol / 2)) * planeSize;
-                GameObject obj = GameObject.Instantiate(plane, pos, transform.rotation);
+                pos = transform.position + (Vector3.back * (i - planeRow / 2) + Vector3.right * (j - planeCol / 2)) * planeSize;
+                obj = GameObject.Instantiate(plane, pos, transform.rotation);
                 obj.transform.parent = transform;
+                obj.transform.localScale *= 0.9f;
                 floor[i, j] = obj;
             }
         }
 
-        
+        float bigPlaneSize = planeRow * planeSize;
+        pos = transform.position + (Vector3.back * ( - planeRow / 2) + Vector3.right * ( - planeCol / 2) + Vector3.down * 1f);
+        obj = GameObject.Instantiate(plane, pos, transform.rotation);
+        obj.transform.parent = transform;
+        Vector3 scale = obj.transform.localScale;
+        Vector3 newScale = (bigPlaneSize / planeSize) * scale;
+        obj.transform.localScale = newScale;
+        obj.GetComponent<Renderer>().material.SetColor("_Color",Color.black);
     }
 
     // Update is called once per frame

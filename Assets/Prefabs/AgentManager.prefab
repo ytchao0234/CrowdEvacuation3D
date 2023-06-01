@@ -44,4 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb73b6d7558f5b14e9e98f6d87c30ced, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 2410138128131608266, guid: 02952c7a90264704e9e2f3e27079ae40, type: 3}
+  agent: {fileID: 8231972246912948757, guid: 42b054c8370c75c49a906bd766a0b00c, type: 3}
+  materials: []
+  agentList: []
+  currentPos: []
+  volunteerStrategy: []
+  inChargeOfList: 

@@ -5,11 +5,14 @@ using UnityEngine;
 public class AgentManager : MonoBehaviour
 {
     public GameObject agent;
+    public List<Material> materials;
     int agentNumber;
     float agentHeight;
     public List<GameObject> agentList = new List<GameObject>();
     List<Vector2Int> lastPos = new List<Vector2Int>();
     public List<Vector2Int> currentPos = new List<Vector2Int>();
+    List<Quaternion> lastRot = new List<Quaternion>();
+    List<Quaternion> currentRot = new List<Quaternion>();
     public List<List<int>> whiteList = new List<List<int>>();
     public List<List<int>> blackList = new List<List<int>>();
     public List<string> volunteerStrategy = new List<string>();
@@ -51,7 +54,8 @@ public class AgentManager : MonoBehaviour
         int planeRow = gui.planeRow;
         int planeCol = gui.planeCol;
         agentNumber = Mathf.FloorToInt(planeRow * planeCol * agentDensity);
-        agentHeight = agent.transform.GetComponent<Renderer>().bounds.size.y;
+        agentHeight = agent.transform.Find("top").transform.GetComponent<Renderer>().bounds.size.y;
+        agentHeight += agent.transform.Find("bottom").transform.GetComponent<Renderer>().bounds.size.y;
 
         int[] randomNumbers = new int [planeRow * planeCol];
         for (int k = 0; k < randomNumbers.Length; k ++)
@@ -72,11 +76,14 @@ public class AgentManager : MonoBehaviour
             if (fm.isEmptyCell(new Vector2Int(i, j)) && !fm.isExitCell(new Vector2Int(i, j)))
             {
                 GameObject obj = GameObject.Instantiate(agent, fm.floor[i, j].transform);
-                obj.transform.localScale = Vector3.one * 4f;
-                obj.transform.position += Vector3.up * agentHeight * 2f;
+                obj.transform.localScale = Vector3.one * 6f;
+                obj.transform.position += Vector3.up * agentHeight / 2f;
+                obj.transform.eulerAngles = new Vector3(0f, Random.Range(0f, 360f), 0f);
                 SetAgentType(obj,"ActiveAgent");
                 lastPos.Add(new Vector2Int(i,j));
                 currentPos.Add(new Vector2Int(i,j));
+                lastRot.Add(obj.transform.rotation);
+                currentRot.Add(obj.transform.rotation);
                 agentList.Add(obj);
                 whiteList.Add(new List<int>());
                 blackList.Add(new List<int>());
@@ -100,6 +107,8 @@ public class AgentManager : MonoBehaviour
         agentList.Clear();
         lastPos.Clear();
         currentPos.Clear();
+        lastRot.Clear();
+        currentRot.Clear();
         volunteerStrategy.Clear();
         whiteList.Clear();
         blackList.Clear();
@@ -110,6 +119,8 @@ public class AgentManager : MonoBehaviour
     void AgentMove()
     {
         GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+
         int[] random_agent = ShuffleRange_Int(0, agentNumber - 1);
         gui.flg_update_sff = false;
 
@@ -121,7 +132,7 @@ public class AgentManager : MonoBehaviour
             {
                 AgentMove_Volunteer(i);
             }
-
+            
             // if (agentList[i].transform.tag == "Volunteer")
             //     AgentMove_Volunteer(i);
         }
@@ -170,6 +181,10 @@ public class AgentManager : MonoBehaviour
                 dff.dff[currentPos[i].x,currentPos[i].y] += 1f;
                 lastPos[i] = currentPos[i];
                 currentPos[i] = cell;
+                Vector3 direct = fm.floor[currentPos[i].x, currentPos[i].y].transform.position - fm.floor[lastPos[i].x, lastPos[i].y].transform.position;
+                direct = Vector3.Normalize(direct);
+                lastRot[i] = agentList[i].transform.rotation;
+                currentRot[i] = Quaternion.LookRotation(direct);
                 agentList[i].transform.parent = fm.floor[cell.x, cell.y].transform;
 
                 if (fm.floor[cell.x, cell.y].transform.tag == "Exit")
@@ -235,7 +250,12 @@ public class AgentManager : MonoBehaviour
 
                 lastPos[i] = currentPos[i];
                 currentPos[i] = volunteerPos;
+                Vector3 direct = fm.floor[obstaclePos.x, obstaclePos.y].transform.position - fm.floor[currentPos[i].x, currentPos[i].y].transform.position;
+                direct = Vector3.Normalize(direct);
+                lastRot[i] = agentList[i].transform.rotation;
+                currentRot[i] = Quaternion.LookRotation(direct);
                 agentList[i].transform.parent = fm.floor[currentPos[i].x, currentPos[i].y].transform;
+
                 // om.currentPos[inChargeOfList[i]] = obstaclePos;
                 om.obstacleList[inChargeOfList[i]].transform.parent = fm.floor[obstaclePos.x, obstaclePos.y].transform;
                 // TODO: animation
@@ -337,6 +357,8 @@ public class AgentManager : MonoBehaviour
                 agentList.RemoveAt(i);
                 lastPos.RemoveAt(i);
                 currentPos.RemoveAt(i);
+                lastRot.RemoveAt(i);
+                currentRot.RemoveAt(i);
                 volunteerStrategy.RemoveAt(i);
                 whiteList.RemoveAt(i);
                 blackList.RemoveAt(i);
@@ -374,18 +396,41 @@ public class AgentManager : MonoBehaviour
 
         float timer = 0.0f;
         float duration = 0.8f;
+        float rotation_duration = 0.4f;
         Vector2Int lastCell = lastPos[i];
         Vector2Int curCell = currentPos[i];
         Vector3 last = fm.floor[lastCell.x, lastCell.y].transform.position;
         Vector3 current = fm.floor[curCell.x, curCell.y].transform.position;
+        last.y = agentList[i].transform.position.y;
+        current.y = agentList[i].transform.position.y;
+        
+        Quaternion lastRotation = lastRot[i];
+        Quaternion currentRotation = currentRot[i];
+        Animator anima = agentList[i].transform.GetComponent<Animator>();
 
+        // animation.SetValue("Walk", false);
+        // animation.SetValue("MoveObs", false);
+        if (lastCell != curCell && agentList[i].transform.tag == "ActiveAgent")
+            anima.SetBool("Walk", true);
+        else if ((lastCell != curCell || lastRotation != currentRotation) && agentList[i].transform.tag == "Volunteer")
+            anima.SetBool("MoveObs", true);
+        if(i == 0)
+        {
+            Debug.Log("Walk: " + anima.GetBool("Walk").ToString());
+            Debug.Log("MoveObs: " + anima.GetBool("MoveObs").ToString());
+        }
+        
+        
         while (timer < duration)
         {
             timer += Time.deltaTime;
             agentList[i].transform.position = Vector3.Lerp(last, current, timer/duration);
+            agentList[i].transform.rotation = Quaternion.Lerp(lastRotation,currentRotation,timer/rotation_duration);
             yield return null;
         }
 
+        anima.SetBool("Walk", false);
+        anima.SetBool("MoveObs", false);
         yield break;
     }
 
@@ -397,19 +442,38 @@ public class AgentManager : MonoBehaviour
 
     public void SetAgentType(GameObject agent, string type)
     {
+        Renderer[] renders = {
+            agent.transform.Find("bottom").GetComponent<Renderer>(),
+            agent.transform.Find("top").GetComponent<Renderer>(),
+            agent.transform.Find("face").GetComponent<Renderer>(),
+            agent.transform.Find("hair").GetComponent<Renderer>()
+        };
+    
         switch (type)
         {
             case "ActiveAgent":
+                // B03, A06, C04, C04
                 agent.transform.tag = type;
-                agent.GetComponent<Renderer>().material.color = Color.gray;
+                renders[0].material = Resources.Load<Material>("Materials/B03");
+                renders[1].material = Resources.Load<Material>("Materials/A06");
+                renders[2].material = Resources.Load<Material>("Materials/C04");
+                renders[3].material = Resources.Load<Material>("Materials/C04");
                 break;
             case "ExitAgent":
+                // C06, C06, C04, C04
                 agent.transform.tag = type;
-                agent.GetComponent<Renderer>().material.color = Color.gray;
+                renders[0].material = Resources.Load<Material>("Materials/C06");
+                renders[1].material = Resources.Load<Material>("Materials/C06");
+                renders[2].material = Resources.Load<Material>("Materials/C04");
+                renders[3].material = Resources.Load<Material>("Materials/C04");
                 break;
             case "Volunteer":
+                // A04, C03, C04, C04
                 agent.transform.tag = type;
-                agent.GetComponent<Renderer>().material.color = Color.blue;
+                renders[0].material = Resources.Load<Material>("Materials/A04");
+                renders[1].material = Resources.Load<Material>("Materials/C03");
+                renders[2].material = Resources.Load<Material>("Materials/C04");
+                renders[3].material = Resources.Load<Material>("Materials/C04");
                 break;
             default:
                 break;

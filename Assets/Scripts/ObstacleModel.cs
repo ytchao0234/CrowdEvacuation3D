@@ -481,6 +481,8 @@ public class ObstacleModel : MonoBehaviour
         float duration = 0.8f;
         Vector3 from = fm.floor[currentPos[i].x, currentPos[i].y].transform.position;
         Vector3 to = fm.floor[dest.x, dest.y].transform.position;
+        from.y = obstacleList[i].transform.position.y;
+        to.y = obstacleList[i].transform.position.y;
         currentPos[i] = dest;
 
         while (timer < duration)
