@@ -46,6 +46,7 @@ public class GUI : MonoBehaviour
        FindObjectOfType<StaticFloorField>().Setup();
        FindObjectOfType<StaticFloorField_ExitWidth>().Setup();
        FindObjectOfType<ObstacleModel>().Setup();
+       FindObjectOfType<CameraMovment>().Setup();
     }
 
     public void Reset()
