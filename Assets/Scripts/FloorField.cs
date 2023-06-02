@@ -41,8 +41,8 @@ public class FloorField : MonoBehaviour
         GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
 
-        float min = Mathf.Log(src_ff.Cast<float>().Min(),2);
-        float max = Mathf.Log(src_ff.Cast<float>().Max(),2);
+        float min = src_ff.Cast<float>().Min();
+        float max = src_ff.Cast<float>().Max();
         float range = max - min;
 
         Gradient gradient = new Gradient();
@@ -78,7 +78,7 @@ public class FloorField : MonoBehaviour
             if(range == 0.0f)
                 value = 0.0f;
             else
-                value = ((Mathf.Log(src_ff[i,j],2) - min) / range);
+                value = ((src_ff[i,j] - min) / range);
             fm.floor[i,j].GetComponent<Renderer>().material.color = gradient.Evaluate(value);
         }
     }

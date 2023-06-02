@@ -82,7 +82,7 @@ public class SpecificFloorField : MonoBehaviour
                 if (i == 0 && j == 0) continue;
                 adjCell = curCell + new Vector2Int(i, j);
 
-                if (fm.isValidCell(adjCell))
+                if (fm.isValidCell(adjCell) && !fm.isObstacleCell(adjCell))
                 {
                     float offset = (i == 0 || j == 0) ? offset_hv : offset_d;
                     if (sff[adjCell.x, adjCell.y] > sff[curCell.x, curCell.y] + offset)

@@ -334,8 +334,8 @@ public class ObstacleModel : MonoBehaviour
             bool isBlocked = false;
             foreach(int exit_idx in exit)
             {
-                if(Mathf.Abs(currentPos[obstacle_idx].x - gui.exitPos[exit_idx].x) <= 1 &&
-                    Mathf.Abs(currentPos[obstacle_idx].y - gui.exitPos[exit_idx].y) <= 1)
+                if(Mathf.Abs(currentPos[obstacle_idx].x - gui.exitPos[exit_idx].x) <= gui.min_distance_from_exits &&
+                    Mathf.Abs(currentPos[obstacle_idx].y - gui.exitPos[exit_idx].y) <= gui.min_distance_from_exits)
                    isBlocked = true;
             }
             if(!isBlocked)

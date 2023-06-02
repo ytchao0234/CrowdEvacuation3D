@@ -82,7 +82,7 @@ public class StaticFloorField : MonoBehaviour
 
                 adjCell = curCell + new Vector2Int(i, j);
 
-                if (fm.isValidCell(adjCell))
+                if (fm.isValidCell(adjCell) && !fm.isImmovableObstacle(adjCell))
                 {
                     float offset = (i == 0 || j == 0) ? offset_hv : offset_d;
 

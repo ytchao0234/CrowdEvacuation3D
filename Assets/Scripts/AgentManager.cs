@@ -58,7 +58,7 @@ public class AgentManager : MonoBehaviour
                 FindObjectOfType<StaticFloorField>().Setup();
                 FindObjectOfType<StaticFloorField_ExitWidth>().Setup();
             }
-            // FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<FloorField>().ff);
+            // FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<StaticFloorField>().sff);
             FindObjectOfType<ObstacleModel>().Setup();
         }
     }
