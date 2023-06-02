@@ -17,6 +17,8 @@ public class AgentManager : MonoBehaviour
     public List<List<int>> blackList = new List<List<int>>();
     public List<string> volunteerStrategy = new List<string>();
     public List<int> inChargeOfList = new List<int>();
+    float timer = 0f;
+    float timestep = 1.3f;
 
     // Start is called before the first frame update
     void Start()
@@ -30,7 +32,18 @@ public class AgentManager : MonoBehaviour
     {
         GUI gui = FindObjectOfType<GUI>();
         if (Input.GetKeyDown(KeyCode.Space))
+            gui.flg_update = true;
+        if (gui.flg_update)
         {
+            timer += Time.deltaTime;
+            if (agentList.Count == 0)
+                gui.flg_update = false;
+        }
+
+
+        if (timer >= timestep)
+        {
+            timer = 0f;
             FindObjectOfType<FloorField>().Compute();
             FindObjectOfType<AnticipationFloorField>().UpdateAFF();
             RemoveExitAgents();
@@ -170,6 +183,7 @@ public class AgentManager : MonoBehaviour
         if (possiblePos.Count == 0)
         {
             lastPos[i] = currentPos[i];
+            lastRot[i] = currentRot[i];
             return;
         }
 
@@ -184,6 +198,7 @@ public class AgentManager : MonoBehaviour
                 if (cell == currentPos[i]) 
                 {
                     lastPos[i] = currentPos[i];
+                    lastRot[i] = currentRot[i];
                     // Debug.Log("lastPos: " + lastPos[i].ToString());
                     // Debug.Log("currentPos: " + currentPos[i].ToString());
                     return;
@@ -244,6 +259,7 @@ public class AgentManager : MonoBehaviour
         if (possiblePos.Count == 0)
         {
             lastPos[i] = currentPos[i];
+            lastRot[i] = currentRot[i];
             return;
         }
          
@@ -261,6 +277,7 @@ public class AgentManager : MonoBehaviour
                 else if (cell == obstaclePos)
                 {
                     lastPos[i] = currentPos[i];
+                    lastRot[i] = currentRot[i];
                     // Debug.Log("lastPos: " + lastPos[i].ToString());
                     // Debug.Log("currentPos: " + currentPos[i].ToString());
                     return;

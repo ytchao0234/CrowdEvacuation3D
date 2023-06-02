@@ -4,8 +4,9 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
+  - wall: {fileID: 1888840106173808, guid: 7a3c0af1341687548ad8ad09bc513bae, type: 3}
   - obstacle: {fileID: 523459669970978625, guid: ef447603545d7574db6fba4207e92494, type: 3}
-  executionOrder: 460
+  executionOrder: 270
   icon: {instanceID: 0}
   userData: 
   assetBundleName: 

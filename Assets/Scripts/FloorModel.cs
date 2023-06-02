@@ -61,7 +61,7 @@ public class FloorModel : MonoBehaviour
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
-            floor[i,j].GetComponent<Renderer>().material.color = Color.white;
+            // floor[i,j].GetComponent<Renderer>().material.color = Color.white;
         }
     }
 

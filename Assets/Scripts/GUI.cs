@@ -24,6 +24,7 @@ public class GUI : MonoBehaviour
     public float low_density = 0.5f;
     public int min_distance_from_exits = 2;
     public bool flg_update_sff = false;
+    public bool flg_update = false;
 
     // Start is called before the first frame update
     void Start()

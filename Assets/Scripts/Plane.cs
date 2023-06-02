@@ -8,6 +8,8 @@ public class Plane : MonoBehaviour
     void Awake()
     {
         float planeSize = transform.GetComponent<Renderer>().bounds.size.x;
+        Renderer rend = GetComponent<Renderer>();
+        rend.material = material;
         // float startx = transform.position.x - planeSize / 2f;
         // float startz = transform.position.z - planeSize / 2f;
         // float endx = transform.position.x + planeSize / 2f;

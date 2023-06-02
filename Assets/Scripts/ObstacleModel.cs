@@ -6,8 +6,13 @@ using System.Linq;
 
 public class ObstacleModel : MonoBehaviour
 {
+    public GameObject wall;
     public GameObject obstacle;
-    public float obstacleSize;
+    public float wall_x;
+    public float wall_y;
+    public float wall_z;
+    public float obstacleSize_x;
+    public float obstacleSize_y;
     public List<GameObject> obstacleList;
     public List<Vector2Int> currentPos;
     List<int> influenceRadiusList;
@@ -31,17 +36,24 @@ public class ObstacleModel : MonoBehaviour
         volunteerList = new List<int>();
         densityList = new List<float>();
         tauList = new List<float>();                                          
-        obstacleSize = obstacle.transform.GetComponent<Renderer>().bounds.size.x;
+        wall_x = wall.transform.GetComponent<Renderer>().bounds.size.x;
+        wall_y = wall.transform.GetComponent<Renderer>().bounds.size.y;
+        wall_z = wall.transform.GetComponent<Renderer>().bounds.size.z;
+        obstacleSize_x = obstacle.transform.GetComponent<Renderer>().bounds.size.x;
+        obstacleSize_y = obstacle.transform.GetComponent<Renderer>().bounds.size.y;
         float planeSize = fm.plane.transform.GetComponent<Renderer>().bounds.size.x;
-        List<Vector2Int> boundPos = new List<Vector2Int>();
+        List<Vector2Int> boundUpDown = new List<Vector2Int>();
+        List<Vector2Int> boundLeftRight = new List<Vector2Int>();
 
         for (int i = 0; i < gui.planeRow; i++)
         for (int j = 0; j < gui.planeCol; j++)
         {
             if (i != 0 && i != gui.planeRow - 1 && j != 0 && j != gui.planeCol - 1)
                 continue;
-
-            boundPos.Add(new Vector2Int(i, j));
+            if(i == 0 || i == gui.planeRow-1)
+                boundUpDown.Add(new Vector2Int(i, j));
+            else
+                boundLeftRight.Add(new Vector2Int(i, j));
         }
 
         // foreach (Vector2Int exit in gui.exitPos)
@@ -50,11 +62,30 @@ public class ObstacleModel : MonoBehaviour
         //         boundPos.Remove(exit);
         // }
 
-        foreach (Vector2Int bound in boundPos)
+        foreach (Vector2Int bound in boundUpDown)
         {
-            GameObject obj = GameObject.Instantiate(obstacle, fm.floor[bound.x, bound.y].transform);
-            obj.transform.localScale = Vector3.one * (planeSize / obstacleSize);
-            obj.transform.position += Vector3.up * planeSize / 2f;
+            GameObject obj = GameObject.Instantiate(wall, fm.floor[bound.x, bound.y].transform);
+            obj.transform.localScale = Vector3.one * (planeSize / wall_x) * 1.1f + Vector3.up * 5f;
+            obj.transform.position += Vector3.right * planeSize / 5f * 2f;
+            obj.transform.position += Vector3.up * wall_y / 2f;
+            // obj.transform.position += Vector3.forward * planeSize / 4f;
+            if(bound.x == gui.planeRow - 1)
+                obj.transform.position += Vector3.forward * planeSize / 2f;
+            SetObstacleType(obj, "ImmovableObstacle");
+            wallList.Add(obj);
+        }
+
+        foreach (Vector2Int bound in boundLeftRight)
+        {
+            GameObject obj = GameObject.Instantiate(wall, fm.floor[bound.x, bound.y].transform.position, Quaternion.Euler(0,90,0));
+            obj.transform.parent = fm.floor[bound.x, bound.y].transform;
+            obj.transform.localScale = Vector3.one * (planeSize / wall_x) * 1.1f + Vector3.up * 5f;
+            
+            obj.transform.position += Vector3.up * wall_y / 2f;
+            obj.transform.position -= Vector3.forward * planeSize /  5f * 2f;
+
+            if(bound.y != 0)
+                obj.transform.position += Vector3.right * planeSize / 2f ;
             SetObstacleType(obj, "ImmovableObstacle");
             wallList.Add(obj);
         }
@@ -102,14 +133,42 @@ public class ObstacleModel : MonoBehaviour
         FloorModel fm = FindObjectOfType<FloorModel>();
         float planeSize = fm.plane.transform.GetComponent<Renderer>().bounds.size.x;
     
-        GameObject obj = GameObject.Instantiate(obstacle, fm.floor[i, j].transform);
-        obj.transform.localScale = Vector3.one * (planeSize / obstacleSize);
-        obj.transform.position += Vector3.up * planeSize / 2f;
-        SetObstacleType(obj, type);
+        
+        // obj.transform.localScale = Vector3.one * (planeSize / obstacleSize_x);
+        // obj.transform.position += Vector3.up * obstacleSize_y / 2f;
+        
         if(i == 0 || i == gui.planeRow - 1 || j == 0 || j == gui.planeCol - 1)
+        {
+            GameObject obj = GameObject.Instantiate(wall, fm.floor[i, j].transform);
+            SetObstacleType(obj, type);
+            if(i == 0 || i == gui.planeRow - 1)
+            {
+                obj.transform.localScale = Vector3.one * (planeSize / wall_x) * 1.1f + Vector3.up * 5f;
+                obj.transform.position += Vector3.right * planeSize / 5f * 2f;
+                obj.transform.position += Vector3.up * wall_y / 2f;
+                // obj.transform.position += Vector3.forward * planeSize / 4f;
+                if(i == gui.planeRow - 1)
+                    obj.transform.position += Vector3.forward * planeSize / 2f;
+            }
+            else
+            {
+                obj.transform.rotation = Quaternion.Euler(0,90,0);
+                obj.transform.localScale = Vector3.one * (planeSize / wall_x) * 1.1f + Vector3.up * 5f;
+                obj.transform.position += Vector3.up * wall_y / 2f;
+                obj.transform.position -= Vector3.forward * planeSize /  5f * 2f;
+                if(j != 0)
+                    obj.transform.position += Vector3.right * planeSize / 2f ;
+            }
+                
             wallList.Add(obj);
+        }
+            
         else
         {
+            GameObject obj = GameObject.Instantiate(obstacle, fm.floor[i, j].transform);
+            SetObstacleType(obj, type);
+            obj.transform.localScale = Vector3.one * (planeSize / obstacleSize_x);
+            obj.transform.position += Vector3.up * planeSize / 2f;
             obstacleList.Add(obj);
             currentPos.Add(new Vector2Int(i,j));
             inRangeList.Add(new List<int>());
