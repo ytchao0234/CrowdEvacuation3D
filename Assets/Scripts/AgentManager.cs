@@ -5,7 +5,6 @@ using UnityEngine;
 public class AgentManager : MonoBehaviour
 {
     public GameObject agent;
-    public List<Material> materials;
     int agentNumber;
     float agentHeight;
     public List<GameObject> agentList = new List<GameObject>();
@@ -19,6 +18,7 @@ public class AgentManager : MonoBehaviour
     public List<int> inChargeOfList = new List<int>();
     float timer = 0f;
     float timestep = 1.3f;
+    int timestep_counter = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -32,18 +32,22 @@ public class AgentManager : MonoBehaviour
     {
         GUI gui = FindObjectOfType<GUI>();
         if (Input.GetKeyDown(KeyCode.Space))
-            gui.flg_update = true;
+            gui.flg_update = !gui.flg_update;
         if (gui.flg_update)
         {
             timer += Time.deltaTime;
             if (agentList.Count == 0)
+            {
                 gui.flg_update = false;
+                timestep_counter = 0; 
+            }
         }
-
 
         if (timer >= timestep)
         {
             timer = 0f;
+            timestep_counter ++;
+            gui.SetInfo("TimeSteps", timestep_counter.ToString());
             FindObjectOfType<FloorField>().Compute();
             FindObjectOfType<AnticipationFloorField>().UpdateAFF();
             RemoveExitAgents();
@@ -176,7 +180,7 @@ public class AgentManager : MonoBehaviour
                 float ff_value = ff.ff[cell.x, cell.y];
                 if (lastPos[i] == cell)
                     ff_value = ff_value - gui.kD;
-                possiblePos.Add((cell, Mathf.Exp(ff_value)));
+                possiblePos.Add((cell, ff_value));
             }
         }
 
@@ -436,7 +440,7 @@ public class AgentManager : MonoBehaviour
 
         float timer = 0.0f;
         float duration = 0.8f;
-        float rotation_duration = 0.4f;
+        float rotation_duration = 0.6f;
         Vector2Int lastCell = lastPos[i];
         Vector2Int curCell = currentPos[i];
         Vector3 last = fm.floor[lastCell.x, lastCell.y].transform.position;

@@ -6,6 +6,7 @@ using UnityEngine;
 public class DynamicFloorField : MonoBehaviour
 {
     public float[,] dff;
+    float max_value;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +33,24 @@ public class DynamicFloorField : MonoBehaviour
         for (int j = 0; j < gui.planeCol; j++)
         {
             dff[i, j] = 0f;
+        }
+    }
+
+    void SetExitValue()
+    {
+        GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+        max_value = 0f;
+        foreach(float value in dff)
+        {
+            if(value > max_value)
+                max_value = value;
+        }
+        for (int i = 0; i < gui.planeRow; i++)
+        for (int j = 0; j < gui.planeCol; j++)
+        {
+            if (fm.isExitCell(new Vector2Int(i, j)))
+                dff[i,j] = max_value;
         }
     }
 
@@ -85,6 +104,6 @@ public class DynamicFloorField : MonoBehaviour
         }
 
         dff = tmp_dff;
-        
+        SetExitValue();
     }
 }

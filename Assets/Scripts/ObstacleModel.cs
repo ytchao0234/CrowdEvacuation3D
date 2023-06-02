@@ -99,7 +99,6 @@ public class ObstacleModel : MonoBehaviour
 
     public void Setup()
     {
-        Debug.Log("Setup ObModel");
         SetupInRange();
         SetWhiteBlackList();
         SetVolunteer();
@@ -173,7 +172,7 @@ public class ObstacleModel : MonoBehaviour
             currentPos.Add(new Vector2Int(i,j));
             inRangeList.Add(new List<int>());
             volunteerList.Add(-1);
-            influenceRadiusList.Add(1);
+            influenceRadiusList.Add(gui.influence_radius);
         }
     }
 
@@ -258,7 +257,9 @@ public class ObstacleModel : MonoBehaviour
             for (int j = -r; j <=r ; j++)
             for (int k = -r; k <=r ; k++)
             {
-                if(((j*j + k*k) > (r*r)) || (j == 0 && k == 0))
+                // if(((j*j + k*k) > (r*r)) || (j == 0 && k == 0))
+                //     continue;
+                if(j == 0 && k == 0)
                     continue;
                 floorCount++;
                 Vector2Int cell = currentPos[i] + new Vector2Int(j, k);
