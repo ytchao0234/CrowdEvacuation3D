@@ -16,9 +16,6 @@ public class AgentManager : MonoBehaviour
     public List<List<int>> blackList = new List<List<int>>();
     public List<string> volunteerStrategy = new List<string>();
     public List<int> inChargeOfList = new List<int>();
-    float timer = 0f;
-    float timestep = 1.3f;
-    int timestep_counter = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -35,19 +32,19 @@ public class AgentManager : MonoBehaviour
             gui.flg_update = !gui.flg_update;
         if (gui.flg_update)
         {
-            timer += Time.deltaTime;
+            gui.timer += Time.deltaTime;
             if (agentList.Count == 0)
             {
                 gui.flg_update = false;
-                timestep_counter = 0; 
+                gui.timestep_counter = 0; 
             }
         }
 
-        if (timer >= timestep)
+        if (gui.timer >= gui.timestep)
         {
-            timer = 0f;
-            timestep_counter ++;
-            gui.SetInfo("TimeSteps", timestep_counter.ToString());
+            gui.timer = 0f;
+            gui.timestep_counter ++;
+            gui.SetInfo("TimeSteps", gui.timestep_counter.ToString());
             FindObjectOfType<FloorField>().Compute();
             FindObjectOfType<AnticipationFloorField>().UpdateAFF();
             RemoveExitAgents();
@@ -149,6 +146,12 @@ public class AgentManager : MonoBehaviour
             else if (agentList[i].transform.tag == "Volunteer")
             {
                 AgentMove_Volunteer(i);
+            }
+            if (agentList[i].transform.tag == "Volunteer" && 
+                currentPos[i] == lastPos[i] && 
+                Random.value > 0.8f)
+            {
+                FindObjectOfType<ObstacleModel>().SetDestination(i, inChargeOfList[i]);
             }
             
             // if (agentList[i].transform.tag == "Volunteer")
@@ -309,7 +312,7 @@ public class AgentManager : MonoBehaviour
                 // om.obstacleList[inChargeOfList[i]].transform.position += Vector3.up * planeSize / 2f;
                 StartCoroutine(om.ObstacleMove_Animation(inChargeOfList[i], obstaclePos, 0f));
                 //
-                if (obstaclePos == specific_ff.destination)
+                if (om.isDestination(obstaclePos))
                 {
                     om.SetObstacleType(om.obstacleList[inChargeOfList[i]], "ImmovableObstacle");
                     SetAgentType(agentList[i], "ActiveAgent");

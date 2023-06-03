@@ -727,6 +727,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: kA
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: kD
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: low_density
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: agentDensity
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: influence_radius
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206532417154539840, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
+      propertyPath: volunteers_appear_timestep
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8916218576673544333, guid: 8b93f6fa37a837f4998be90db5f74231, type: 3}
       propertyPath: m_Pivot.x
       value: 0

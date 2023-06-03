@@ -24,18 +24,23 @@ public class GUI : MonoBehaviour
     public int aff_radius = 4;
     public int influence_radius = 1;
     public int Not_Assign = -1;
-    public float low_density = 0.2f;
+    public float low_density = 0.3f;
     public int min_distance_from_exits = 2;
     public bool flg_update_sff = false;
     public bool flg_update = false;
     public List<string> infoTextList = new List<string>();
     public TextMeshProUGUI info_text;
+    public float timer = 0f;
+    public float timestep = 1.3f;
+    public int volunteers_appear_timestep = 0;
+    public int timestep_counter = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         info_text = transform.Find("Info/text").GetComponent<TextMeshProUGUI>();
         infoTextList.Add("TimeSteps: 0");
+        infoTextList.Add("Volunteers Appear at: " + volunteers_appear_timestep.ToString());
         infoTextList.Add("Dimension: " + planeRow.ToString() + " x " + planeCol.ToString());
         infoTextList.Add("Agent Density: " + agentDensity.ToString());
         infoTextList.Add("kS: " + kS.ToString());

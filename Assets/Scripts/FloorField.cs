@@ -6,12 +6,14 @@ using UnityEngine;
 public class FloorField : MonoBehaviour
 {
     public float[,] ff;
+    Gradient gradient = new Gradient();
+
     // Start is called before the first frame update
     void Start()
     {
         GUI gui = FindObjectOfType<GUI>();
-
         ff = new float[gui.planeRow, gui.planeCol];
+        SetGradientColor();
     }
 
     // Update is called once per frame
@@ -45,8 +47,32 @@ public class FloorField : MonoBehaviour
         float max = src_ff.Cast<float>().Max();
         float range = max - min;
 
-        Gradient gradient = new Gradient();
+        for (int i = 0; i < gui.planeRow; i++)
+        for (int j = 0; j < gui.planeCol; j++)
+        {
+            float value;
+            if(range == 0.0f)
+                value = 0.0f;
+            else
+                value = ((src_ff[i,j] - min) / range);
+            fm.floor[i,j].GetComponent<Renderer>().material.color = GetColor(value);
+        }
+    }
 
+    public void ClearColor()
+    {
+        GUI gui = FindObjectOfType<GUI>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+
+        for (int i = 0; i < gui.planeRow; i++)
+        for (int j = 0; j < gui.planeCol; j++)
+        {
+            fm.floor[i,j].GetComponent<Renderer>().material.color = Color.white;
+        }
+    }
+
+    public void SetGradientColor()
+    {
         // Populate the color keys at the relative time 0 and 1 (0 and 100%)
         GradientColorKey[] colorKey = new GradientColorKey[6];
         colorKey[0].color = Color.blue * 0.5f;
@@ -70,16 +96,9 @@ public class FloorField : MonoBehaviour
         alphaKey[1].time = 1.0f;
 
         gradient.SetKeys(colorKey, alphaKey);
-
-        for (int i = 0; i < gui.planeRow; i++)
-        for (int j = 0; j < gui.planeCol; j++)
-        {
-            float value;
-            if(range == 0.0f)
-                value = 0.0f;
-            else
-                value = ((src_ff[i,j] - min) / range);
-            fm.floor[i,j].GetComponent<Renderer>().material.color = gradient.Evaluate(value);
-        }
+    }
+    public Color GetColor(float value)
+    {
+        return gradient.Evaluate(value);
     }
 }

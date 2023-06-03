@@ -99,9 +99,13 @@ public class ObstacleModel : MonoBehaviour
 
     public void Setup()
     {
-        SetupInRange();
-        SetWhiteBlackList();
-        SetVolunteer();
+        GUI gui = FindObjectOfType<GUI>();
+        if (gui.timestep_counter >= gui.volunteers_appear_timestep)
+        {
+            SetupInRange();
+            SetWhiteBlackList();
+            SetVolunteer();
+        }
     }
 
     public void Reset()
@@ -241,8 +245,10 @@ public class ObstacleModel : MonoBehaviour
         FloorField ff = FindObjectOfType<FloorField>();
         FloorModel fm = FindObjectOfType<FloorModel>();
         AgentManager am = FindObjectOfType<AgentManager>();
+        // int colorCount = 0;
 
         densityList.Clear();
+        // ff.ClearColor();
         for (int i = 0; i < obstacleList.Count; i++)
         {
             inRangeList[i].Clear();
@@ -253,6 +259,7 @@ public class ObstacleModel : MonoBehaviour
             int r = influenceRadiusList[i];
             int floorCount = 0;
             int agentCount = 0;
+            // Color color1 = ff.GetColor((float) colorCount ++ / obstacleList.Count);
 
             for (int j = -r; j <=r ; j++)
             for (int k = -r; k <=r ; k++)
@@ -263,6 +270,12 @@ public class ObstacleModel : MonoBehaviour
                     continue;
                 floorCount++;
                 Vector2Int cell = currentPos[i] + new Vector2Int(j, k);
+                
+                // if (fm.isValidCell(cell))
+                // {
+                //     Color color2 = fm.floor[cell.x,cell.y].GetComponent<Renderer>().material.color;
+                //     fm.floor[cell.x,cell.y].GetComponent<Renderer>().material.color = (color1+color2)/2f;
+                // }
 
                 if (fm.isValidCell(cell) && fm.isAgentCell(cell))
                 {
@@ -274,6 +287,8 @@ public class ObstacleModel : MonoBehaviour
                     }
                     agentCount++;
                 }
+                else if (fm.isValidCell(cell) && !fm.isEmptyCell(cell))
+                    agentCount++;
             }
             if(floorCount != 0)
                 densityList[i] = (float)agentCount/floorCount;
@@ -453,7 +468,7 @@ public class ObstacleModel : MonoBehaviour
         return flag;
     }
 
-    void SetDestination(int volunteer_idx, int obstacle_idx)
+    public void SetDestination(int volunteer_idx, int obstacle_idx)
     {
         AgentManager am = FindObjectOfType<AgentManager>();
         SpecificFloorField specific_ff = am.agentList[volunteer_idx].GetComponent<SpecificFloorField>();
@@ -472,7 +487,7 @@ public class ObstacleModel : MonoBehaviour
             for(int j = 0; j < gui.planeCol;j++)
             {
                 Vector2Int cell = new Vector2Int(i,j);
-                float sff_value = gui.kS * sff.sff[i,j] + gui.kE * sff_e.sff_e[i,j];
+                float sff_value = sff.sff[i,j];
                 if(!(fm.isEmptyCell(cell) || fm.isAgentCell(cell)) || 
                     sff_value < gui.min_distance_from_exits || cell == am.currentPos[volunteer_idx])
                     continue;
@@ -525,6 +540,36 @@ public class ObstacleModel : MonoBehaviour
         specific_ff.Setup();
     }
 
+    public bool isDestination(Vector2Int dest)
+    {
+        GUI gui = FindObjectOfType<GUI>();
+        StaticFloorField sff = FindObjectOfType<StaticFloorField>();
+        StaticFloorField_ExitWidth sff_e = FindObjectOfType<StaticFloorField_ExitWidth>();
+        FloorModel fm = FindObjectOfType<FloorModel>();
+        float sff_value = sff.sff[dest.x,dest.y];
+        if(sff_value < gui.min_distance_from_exits)
+            return false;
+
+        Vector2Int adjCell;
+        int numWallNeighbors = 0;
+        for(int i = -1; i <= 1; i++)
+        {
+            for(int j = -1; j <=1; j++)
+            {
+                if(i == 0 && j == 0)
+                    continue;
+                adjCell = dest + new Vector2Int(i,j);
+                if(fm.isValidCell(adjCell) && fm.isImmovableObstacle(adjCell))
+                    numWallNeighbors++;
+            }
+        }
+
+        if(numWallNeighbors >= 3)
+            return true;
+        else 
+            return false;
+    }
+
     public bool LowTauDensity(int obstacle_idx)
     {
         GUI gui = FindObjectOfType<GUI>();
@@ -534,7 +579,6 @@ public class ObstacleModel : MonoBehaviour
     public IEnumerator ObstacleMove_Animation(int i, Vector2Int dest, float delay = 0f)
     {
         yield return new WaitForSeconds(delay);
-
         FloorModel fm = FindObjectOfType<FloorModel>();
 
         float timer = 0.0f;
@@ -544,6 +588,7 @@ public class ObstacleModel : MonoBehaviour
         from.y = obstacleList[i].transform.position.y;
         to.y = obstacleList[i].transform.position.y;
         currentPos[i] = dest;
+        // SetupInRange();
 
         while (timer < duration)
         {

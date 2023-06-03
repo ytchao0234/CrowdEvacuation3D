@@ -45,6 +45,7 @@ public class StaticFloorField_ExitWidth : MonoBehaviour
             if(sff_e[i,j] >= gui.sff_init_value)
                 sff_e[i,j] = max_value;
         }
+        Debug.Log(sff_e[exitPos[0].x,exitPos[0].y-1]);
     }
 
     public void Reset()
@@ -64,7 +65,6 @@ public class StaticFloorField_ExitWidth : MonoBehaviour
         GUI gui = FindObjectOfType<GUI>();
         FloorField ff = FindObjectOfType<FloorField>();
         FloorModel fm = FindObjectOfType<FloorModel>();
-
         
         float offset_hv = Mathf.Exp(-1.0f * exitWidth / gui.totalExitWidth);
         float offset_d = offset_hv * gui.sff_offset_lambda;

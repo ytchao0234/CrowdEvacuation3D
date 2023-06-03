@@ -155,6 +155,10 @@ MonoBehaviour:
   flg_update: 0
   infoTextList: []
   info_text: {fileID: 0}
+  timer: 0
+  timestep: 1.3
+  volunteers_appear_timestep: 0
+  timestep_counter: 0
 --- !u!1001 &418880806769225041
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -397,7 +401,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1758100144035890457, guid: 8568f6f1fde156a4f9eef1d30d54ec3d, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 240
+      value: 260
       objectReference: {fileID: 0}
     - target: {fileID: 3139945319089642156, guid: 8568f6f1fde156a4f9eef1d30d54ec3d, type: 3}
       propertyPath: m_Pivot.x
@@ -433,7 +437,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3139945319089642156, guid: 8568f6f1fde156a4f9eef1d30d54ec3d, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 250
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 3139945319089642156, guid: 8568f6f1fde156a4f9eef1d30d54ec3d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -469,7 +473,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3139945319089642156, guid: 8568f6f1fde156a4f9eef1d30d54ec3d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -125
+      value: -135
       objectReference: {fileID: 0}
     - target: {fileID: 3139945319089642156, guid: 8568f6f1fde156a4f9eef1d30d54ec3d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
