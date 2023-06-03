@@ -387,7 +387,7 @@ public class ObstacleModel : MonoBehaviour
         }
         if (agents.Count == 1)
         {
-            am.volunteerStrategy[0] = "D";
+            am.volunteerStrategy[0] = "C";
             // Debug.Log("Number of Potential Volunteers: 1");
             return;
         }

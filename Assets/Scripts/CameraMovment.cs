@@ -39,7 +39,7 @@ public class CameraMovment : MonoBehaviour
         FloorModel fm = FindObjectOfType<FloorModel>();
 
         Vector2Int cell = new Vector2Int(gui.planeRow - 1,gui.planeCol / 2);
-        CameraPosition = fm.floor[cell.x,cell.y].transform.position + Vector3.back * 10f + Vector3.up * 50f;
+        CameraPosition = fm.floor[cell.x,cell.y].transform.position + Vector3.left * 5f + Vector3.back * 15f + Vector3.up * 50f;
         // new Vector3(fm.floor[cell.x,cell.y].transform.position.x,fm.floor[cell.x,cell.y].y + 50,0);
         this.transform.eulerAngles = new Vector3(45f,0f,0f);
     }
