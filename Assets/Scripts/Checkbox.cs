@@ -7,7 +7,7 @@ public class Checkbox : MonoBehaviour
 {
     public int i, j;
     public int select = 0; // Empty, Movable, Immovable
-    int selectNumber = 3;
+    int selectNumber = 4;
     public string type = ""; // Valid, Bound, Exit
     Button checkbtn;
 
@@ -78,6 +78,10 @@ public class Checkbox : MonoBehaviour
                 break;
             case 2:
                 SetButtonColor(Color.gray);
+                break;
+            case 3:
+                SetButtonColor(Color.red);
+                FindObjectOfType<GUI>().disaster_cell = new Vector2Int(i,j);
                 break;
             default:
                 break;

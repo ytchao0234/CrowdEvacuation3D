@@ -40,11 +40,13 @@ public class AgentManager : MonoBehaviour
             }
         }
 
-        if (gui.timer >= gui.timestep)
+        if (gui.timer > gui.timestep)
         {
             gui.timer = 0f;
             gui.timestep_counter ++;
             gui.SetInfo("TimeSteps", gui.timestep_counter.ToString());
+            if (gui.timestep_counter == gui.show_disaster)
+                FindObjectOfType<DisasterFloorField>().SetDisasterCell(gui.disaster_cell);
             FindObjectOfType<FloorField>().Compute();
             FindObjectOfType<AnticipationFloorField>().UpdateAFF();
             RemoveExitAgents();
@@ -55,7 +57,12 @@ public class AgentManager : MonoBehaviour
                 FindObjectOfType<StaticFloorField>().Setup();
                 FindObjectOfType<StaticFloorField_ExitWidth>().Setup();
             }
-            // FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<DynamicFloorField>().dff);
+            if (gui.show_disaster >=0 && gui.timestep_counter >= gui.show_disaster)
+            {
+                FindObjectOfType<FloorField>().DrawHeatMap(FindObjectOfType<DisasterFloorField>().dff);
+                FindObjectOfType<DisasterFloorField>().UpdateDFF_Diffuse_and_Decay();
+            }
+            
             FindObjectOfType<ObstacleModel>().Setup();
         }
     }

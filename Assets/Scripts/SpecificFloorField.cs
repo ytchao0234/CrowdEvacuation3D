@@ -30,9 +30,15 @@ public class SpecificFloorField : MonoBehaviour
         Reset();
         GUI gui = FindObjectOfType<GUI>();
         FloorModel fm = FindObjectOfType<FloorModel>();
+        DisasterFloorField dis_ff = FindObjectOfType<DisasterFloorField>();
 
         sff[destination.x, destination.y] = 0f;
         SetSFF();
+        for(int i = 0; i < gui.planeRow; i++)
+        for(int j = 0; j < gui.planeCol; j++)
+        {
+            sff[i,j] += dis_ff.dff[i,j];
+        }
         foreach(float value in sff)
         {
             if(value < gui.sff_init_value && value > max_value)

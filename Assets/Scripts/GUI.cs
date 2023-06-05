@@ -34,13 +34,15 @@ public class GUI : MonoBehaviour
     public float timestep = 1.3f;
     public int volunteers_appear_timestep = 0;
     public int timestep_counter = 0;
+    public int show_disaster = 3;
+    public Vector2Int disaster_cell;
 
     // Start is called before the first frame update
     void Start()
     {
         info_text = transform.Find("Info/text").GetComponent<TextMeshProUGUI>();
         infoTextList.Add("TimeSteps: 0");
-        infoTextList.Add("Volunteers Appear at: " + volunteers_appear_timestep.ToString());
+        infoTextList.Add("Disaster Occurs at: " + show_disaster.ToString());
         infoTextList.Add("Dimension: " + planeRow.ToString() + " x " + planeCol.ToString());
         infoTextList.Add("Agent Density: " + agentDensity.ToString());
         infoTextList.Add("kS: " + kS.ToString());
@@ -91,6 +93,7 @@ public class GUI : MonoBehaviour
         FindObjectOfType<StaticFloorField_ExitWidth>().Setup();
         FindObjectOfType<ObstacleModel>().Setup();
         FindObjectOfType<CameraMovment>().Setup();
+        FindObjectOfType<DisasterFloorField>().Setup();
     }
 
     public void Reset()
@@ -102,6 +105,7 @@ public class GUI : MonoBehaviour
         FindObjectOfType<DynamicFloorField>().Reset();
         FindObjectOfType<StaticFloorField>().Reset();
         FindObjectOfType<StaticFloorField_ExitWidth>().Reset();
+        FindObjectOfType<DisasterFloorField>().Reset();
     }
 
     void SetupExitWidth()

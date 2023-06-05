@@ -28,6 +28,7 @@ public class FloorField : MonoBehaviour
         StaticFloorField sff = FindObjectOfType<StaticFloorField>();
         StaticFloorField_ExitWidth sff_e = FindObjectOfType<StaticFloorField_ExitWidth>();
         DynamicFloorField dff = FindObjectOfType<DynamicFloorField>();
+        DisasterFloorField dis_ff = FindObjectOfType<DisasterFloorField>();
         AnticipationFloorField aff = FindObjectOfType<AnticipationFloorField>();
         FloorModel fm = FindObjectOfType<FloorModel>();
 
@@ -35,6 +36,7 @@ public class FloorField : MonoBehaviour
         for (int j = 0; j < gui.planeCol; j++)
         {
             ff[i,j] = -gui.kS * sff.sff[i,j] - gui.kE * sff_e.sff_e[i,j] + gui.kD * dff.dff[i,j] - gui.kA * aff.aff[i,j];
+            ff[i,j] -= 30f * dis_ff.dff[i,j];
         }
     }
 
